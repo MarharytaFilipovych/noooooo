@@ -2,88 +2,93 @@ namespace Model.Game;
 
 using System;
 using System.Collections.Generic;
-using Model.Core;
 
 public class AtaxxGameWithEvents : AtaxxGame
 {
-    public event Action<Cell[,], string> GameStarted;
-    public event Action<PlayerType> PlayerWon;
-    public event Action GameDrawn;
-    public event Action<PlayerType> TurnChanged;
-    public event Action<Move, PlayerType> MoveMade;
-    public event Action<Move, PlayerType> MoveInvalid;
-    public event Action<List<Position>> PiecesConverted;
-    public event Action<Cell[,]> BoardUpdated;
-    public event Action<List<Move>> HintRequested;
+    private readonly GameEventPublisher _eventPublisher;
+
+    public event Action<Cell[,], string>? GameStarted
+    {
+        add => _eventPublisher.GameStarted += value;
+        remove => _eventPublisher.GameStarted -= value;
+    }
+
+    public event Action<PlayerType>? PlayerWon
+    {
+        add => _eventPublisher.PlayerWon += value;
+        remove => _eventPublisher.PlayerWon -= value;
+    }
+
+    public event Action? GameDrawn
+    {
+        add => _eventPublisher.GameDrawn += value;
+        remove => _eventPublisher.GameDrawn -= value;
+    }
+
+    public event Action<PlayerType>? TurnChanged
+    {
+        add => _eventPublisher.TurnChanged += value;
+        remove => _eventPublisher.TurnChanged -= value;
+    }
+
+    public event Action<Move, PlayerType>? MoveMade
+    {
+        add => _eventPublisher.MoveMade += value;
+        remove => _eventPublisher.MoveMade -= value;
+    }
+
+    public event Action<Move, PlayerType>? MoveInvalid
+    {
+        add => _eventPublisher.MoveInvalid += value;
+        remove => _eventPublisher.MoveInvalid -= value;
+    }
+
+    public event Action<Cell[,]>? BoardUpdated
+    {
+        add => _eventPublisher.BoardUpdated += value;
+        remove => _eventPublisher.BoardUpdated -= value;
+    }
+
+    public event Action<List<Move>>? HintRequested
+    {
+        add => _eventPublisher.HintRequested += value;
+        remove => _eventPublisher.HintRequested -= value;
+    }
 
     public AtaxxGameWithEvents(int boardSize = 7) : base(boardSize)
     {
+        _eventPublisher = new GameEventPublisher();
     }
 
     public AtaxxGameWithEvents(int boardSize, Board.IBoardLayout layout) : base(boardSize, layout)
     {
+        _eventPublisher = new GameEventPublisher();
     }
 
     public void StartGameWithEvents()
     {
         StartGame();
-        GameStarted?.Invoke(GetBoard(), LayoutName);
-        TurnChanged?.Invoke(CurrentPlayer);
+        _eventPublisher.PublishGameStart(GetBoard(), LayoutName, CurrentPlayer);
     }
 
     public bool MakeMoveWithEvents(Position from, Position to)
     {
         var move = new Move(from, to);
         var previousPlayer = CurrentPlayer;
-        
         bool success = MakeMove(from, to);
         
-        if (success)
-        {
-            MoveMade?.Invoke(move, previousPlayer);
-            BoardUpdated?.Invoke(GetBoard());
-            
-            if (!IsEnded)
-            {
-                TurnChanged?.Invoke(CurrentPlayer);
-            }
-            else
-            {
-                if (Winner == PlayerType.None)
-                {
-                    GameDrawn?.Invoke();
-                }
-                else
-                {
-                    PlayerWon?.Invoke(Winner);
-                }
-            }
-        }
-        else
-        {
-            MoveInvalid?.Invoke(move, previousPlayer);
-        }
-        
+        _eventPublisher.PublishMoveResult(this, move, previousPlayer, success);
         return success;
     }
 
     public bool MakeMoveWithEvents(string fromNotation, string toNotation)
     {
-        try
-        {
-            var from = Position.Parse(fromNotation);
-            var to = Position.Parse(toNotation);
-            return MakeMoveWithEvents(from, to);
-        }
-        catch
-        {
-            return false;
-        }
+        if (!PositionParser.TryParse(fromNotation, out var from)) return false;
+        return PositionParser.TryParse(toNotation, out var to) && MakeMoveWithEvents(from, to);
     }
 
     public void RequestHint()
     {
-        var validMoves = GetValidMoves();
-        HintRequested?.Invoke(validMoves);
+        _eventPublisher.PublishHint(GetValidMoves());
     }
 }

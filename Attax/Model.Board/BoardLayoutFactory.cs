@@ -2,38 +2,34 @@ namespace Model.Board;
 
 using System;
 
-public class BoardLayoutFactory
+public abstract class BoardLayoutFactory
 {
-    private static readonly IBoardLayout[] layouts = new IBoardLayout[]
-    {
+    private static readonly IBoardLayout[] Layouts =
+    [
         new ClassicLayout(),
         new CrossLayout(),
         new CenterBlockLayout()
-    };
+    ];
 
-    public static IBoardLayout GetRandomLayout(Random random = null)
+    public static IBoardLayout GetRandomLayout(Random? random = null)
     {
         var rng = random ?? new Random();
-        int index = rng.Next(layouts.Length);
-        return layouts[index];
+        var index = rng.Next(Layouts.Length);
+        return Layouts[index];
     }
 
     public static IBoardLayout GetLayout(int index)
     {
-        if (index < 0 || index >= layouts.Length)
+        if (index < 0 || index >= Layouts.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(index));
         }
-        return layouts[index];
+        return Layouts[index];
     }
 
-    public static int GetLayoutCount()
-    {
-        return layouts.Length;
-    }
+    public static int GetLayoutCount() => Layouts.Length;
 
-    public static IBoardLayout[] GetAllLayouts()
-    {
-        return (IBoardLayout[])layouts.Clone();
-    }
+    public static IBoardLayout[] GetAllLayouts() =>
+        (IBoardLayout[])Layouts.Clone();
+    
 }
