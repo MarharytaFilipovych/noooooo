@@ -3,6 +3,7 @@ namespace Model.Game;
 using System;
 using System.Collections.Generic;
 using Board;
+using DTOs;
 
 public class AtaxxGame
 {
@@ -74,11 +75,37 @@ public class AtaxxGame
 
     public List<Move> GetValidMoves(PlayerType player) => _moveValidator.GetValidMoves(player);
 
-    public Cell GetCell(Position pos) => _board.GetCell(pos);
+    public Model.Cell GetCell(Position pos) => _board.GetCell(pos);
 
-    public Cell[,] GetBoard() => _board.GetCells();
+    public Model.Cell[,] GetBoard() => _board.GetCells();
 
     public (int xCount, int oCount) GetPieceCounts() => _board.CountPieces();
+    
+    public GameState GetGameState()
+    {
+        var (xCount, oCount) = GetPieceCounts();
+        var cells = new CellState[BoardSize, BoardSize];
+    
+        for (int row = 0; row < BoardSize; row++)
+        {
+            for (int col = 0; col < BoardSize; col++)
+            {
+                var cell = GetCell(new Position(row, col));
+                cells[row, col] = new CellState(cell.OccupiedBy, cell.IsBlocked);
+            }
+        }
+
+        return new GameState(
+            BoardSize,
+            cells,
+            CurrentPlayer,
+            xCount,
+            oCount,
+            IsEnded,
+            Winner,
+            LayoutName
+        );
+    }
 
     private void ExecuteMove(Move move)
     {
