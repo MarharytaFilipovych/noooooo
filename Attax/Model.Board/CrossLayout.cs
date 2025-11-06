@@ -6,7 +6,7 @@ public class CrossLayout : IBoardLayout
 
     public bool IsBlocked(int row, int col, int boardSize)
     {
-        int middle = boardSize / 2;
+        var middle = boardSize / 2;
         return col == middle || row == middle;
     }
 }

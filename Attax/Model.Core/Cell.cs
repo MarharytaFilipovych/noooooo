@@ -1,22 +1,14 @@
-﻿namespace Model.Core;
-
-using System;
+﻿namespace Model;
 
 public class Cell
 {
-    public PlayerType OccupiedBy { get; private set; }
-    
+    public PlayerType OccupiedBy { get; private set; } = PlayerType.None;
+
     public bool IsBlocked { get; private set; }
-    
+
     public bool IsEmpty => OccupiedBy == PlayerType.None && !IsBlocked;
     
     public bool IsOccupied => OccupiedBy != PlayerType.None;
-
-    public Cell()
-    {
-        OccupiedBy = PlayerType.None;
-        IsBlocked = false;
-    }
 
     public void MarkAsBlocked()
     {
@@ -79,9 +71,11 @@ public class Cell
 
     public Cell Clone()
     {
-        var cell = new Cell();
-        cell.OccupiedBy = this.OccupiedBy;
-        cell.IsBlocked = this.IsBlocked;
+        var cell = new Cell
+        {
+            OccupiedBy = OccupiedBy,
+            IsBlocked = IsBlocked
+        };
         return cell;
     }
 }

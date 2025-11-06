@@ -8,16 +8,20 @@ public class CenterBlockLayout : IBoardLayout
     {
         if (boardSize != 7)
         {
-            int center = boardSize / 2;
+            var center = boardSize / 2;
             return (row == center && col == center);
         }
         
-        if (row == 1 && col == 3) return true;
-        if (row == 2 && (col == 2 || col == 4)) return true;
-        if (row == 3 && (col == 1 || col == 5)) return true;
-        if (row == 4 && (col == 2 || col == 4)) return true;
-        if (row == 5 && col == 3) return true;
-        
-        return false;
+        switch (row)
+        {
+            case 1 when col == 3:
+            case 2 when col is 2 or 4:
+            case 3 when col is 1 or 5:
+            case 4 when col is 2 or 4:
+            case 5 when col == 3:
+                return true;
+            default:
+                return false;
+        }
     }
 }

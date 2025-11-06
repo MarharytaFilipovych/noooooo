@@ -1,4 +1,4 @@
-namespace Model.Core;
+namespace Model;
 
 public class Move
 {
@@ -11,19 +11,14 @@ public class Move
         From = from;
         To = to;
         
-        int distance = from.DistanceTo(to);
-        if (distance == 1)
+        var distance = from.DistanceTo(to);
+        
+        Type = distance switch
         {
-            Type = MoveType.Clone;
-        }
-        else if (distance == 2)
-        {
-            Type = MoveType.Jump;
-        }
-        else
-        {
-            Type = MoveType.Invalid;
-        }
+            1 => MoveType.Clone,
+            2 => MoveType.Jump,
+            _ => MoveType.Invalid
+        };
     }
 
     public bool IsValid => Type != MoveType.Invalid;
