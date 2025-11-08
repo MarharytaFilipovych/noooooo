@@ -1,19 +1,12 @@
-namespace Controller.Commands;
-
+using Attax.Presenters;
 using Model.Game;
-using Controller.Presenters;
-using System;
 
-public class MoveCommandHandler : ICommandHandler
+namespace Attax.Commands;
+
+public class MoveCommandHandler(AtaxxGameWithEvents game, GamePresenter presenter) : ICommandHandler
 {
-    private readonly AtaxxGameWithEvents _game;
-    private readonly GamePresenter _presenter;
-
-    public MoveCommandHandler(AtaxxGameWithEvents game, GamePresenter presenter)
-    {
-        _game = game ?? throw new ArgumentNullException(nameof(game));
-        _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
-    }
+    private readonly AtaxxGameWithEvents _game = game ?? throw new ArgumentNullException(nameof(game));
+    private readonly GamePresenter _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
 
     public bool CanHandle(string command) => command == "move";
 

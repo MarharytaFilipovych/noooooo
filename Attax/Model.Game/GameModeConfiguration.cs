@@ -16,9 +16,8 @@ public sealed record GameModeConfiguration(
 
     public static GameModeConfiguration CreatePvE(PlayerType humanPlayer)
     {
-        if (humanPlayer == PlayerType.None)
-            throw new ArgumentException("Human player must be X or O", nameof(humanPlayer));
-
-        return new(GameMode.PvE, humanPlayer, humanPlayer.GetOpponent());
+        return humanPlayer == PlayerType.None 
+            ? throw new ArgumentException("Human player must be X or O", nameof(humanPlayer))
+            : new GameModeConfiguration(GameMode.PvE, humanPlayer, humanPlayer.GetOpponent());
     }
 }

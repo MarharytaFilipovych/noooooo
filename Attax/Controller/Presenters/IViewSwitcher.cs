@@ -1,6 +1,6 @@
-namespace Controller.Presenters;
-
 using View;
+
+namespace Attax.Presenters;
 
 public interface IViewSwitcher
 {

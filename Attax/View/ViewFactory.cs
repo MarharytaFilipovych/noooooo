@@ -11,18 +11,11 @@ public class ViewFactory : IViewFactory
         { ViewType.Enhanced, () => new EnhancedView() }
     };
 
-    public IGameView CreateView(ViewType type)
-    {
-        return _viewCreators.TryGetValue(type, out var creator)
+    public IGameView CreateView(ViewType type) =>
+        _viewCreators.TryGetValue(type, out var creator)
             ? creator()
             : new SimpleView();
-    }
 
-    public void RegisterView(ViewType type, Func<IGameView> creator)
-    {
-        if (creator == null)
-            throw new ArgumentNullException(nameof(creator));
-
-        _viewCreators[type] = creator;
-    }
+    public void RegisterView(ViewType type, Func<IGameView> creator) => 
+        _viewCreators[type] = creator ?? throw new ArgumentNullException(nameof(creator));
 }

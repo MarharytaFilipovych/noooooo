@@ -75,7 +75,7 @@ public class AtaxxGameWithEvents : AtaxxGame
     {
         var move = new Move(from, to);
         var previousPlayer = CurrentPlayer;
-        bool success = MakeMove(from, to);
+        var success = MakeMove(from, to);
         
         _eventPublisher.PublishMoveResult(this, move, previousPlayer, success);
         return success;
@@ -87,8 +87,5 @@ public class AtaxxGameWithEvents : AtaxxGame
         return PositionParser.TryParse(toNotation, out var to) && MakeMoveWithEvents(from, to);
     }
 
-    public void RequestHint()
-    {
-        _eventPublisher.PublishHint(GetValidMoves());
-    }
+    public void RequestHint() => _eventPublisher.PublishHint(GetValidMoves());
 }

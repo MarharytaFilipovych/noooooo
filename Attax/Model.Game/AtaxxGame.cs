@@ -59,13 +59,11 @@ public class AtaxxGame
 
     public bool MakeMove(Position from, Position to)
     {
-        if (IsEnded) 
-            throw new InvalidOperationException("Game has ended");
+        if (IsEnded) throw new InvalidOperationException("Game has ended");
 
         var move = new Move(from, to);
         
-        if (!_moveValidator.IsValidMove(move, CurrentPlayer)) 
-            return false;
+        if (!_moveValidator.IsValidMove(move, CurrentPlayer)) return false;
 
         ExecuteMove(move);
         return true;
@@ -75,9 +73,9 @@ public class AtaxxGame
 
     public List<Move> GetValidMoves(PlayerType player) => _moveValidator.GetValidMoves(player);
 
-    public Model.Cell GetCell(Position pos) => _board.GetCell(pos);
+    public Cell GetCell(Position pos) => _board.GetCell(pos);
 
-    public Model.Cell[,] GetBoard() => _board.GetCells();
+    public Cell[,] GetBoard() => _board.GetCells();
 
     public (int xCount, int oCount) GetPieceCounts() => _board.CountPieces();
     
@@ -86,25 +84,17 @@ public class AtaxxGame
         var (xCount, oCount) = GetPieceCounts();
         var cells = new CellState[BoardSize, BoardSize];
     
-        for (int row = 0; row < BoardSize; row++)
+        for (var row = 0; row < BoardSize; row++)
         {
-            for (int col = 0; col < BoardSize; col++)
+            for (var col = 0; col < BoardSize; col++)
             {
                 var cell = GetCell(new Position(row, col));
                 cells[row, col] = new CellState(cell.OccupiedBy, cell.IsBlocked);
             }
         }
 
-        return new GameState(
-            BoardSize,
-            cells,
-            CurrentPlayer,
-            xCount,
-            oCount,
-            IsEnded,
-            Winner,
-            LayoutName
-        );
+        return new GameState(BoardSize, cells, CurrentPlayer, xCount,
+            oCount, IsEnded, Winner, LayoutName);
     }
 
     private void ExecuteMove(Move move)
@@ -141,12 +131,14 @@ public class AtaxxGame
 
     public AtaxxGame Clone()
     {
-        var clonedGame = new AtaxxGame(_board.Clone(), _layout);
-        clonedGame.CurrentPlayer = CurrentPlayer;
-        clonedGame.TurnNumber = TurnNumber;
-        clonedGame.IsEnded = IsEnded;
-        clonedGame.Winner = Winner;
-        
+        var clonedGame = new AtaxxGame(_board.Clone(), _layout)
+        {
+            CurrentPlayer = CurrentPlayer,
+            TurnNumber = TurnNumber,
+            IsEnded = IsEnded,
+            Winner = Winner
+        };
+
         return clonedGame;
     }
 }

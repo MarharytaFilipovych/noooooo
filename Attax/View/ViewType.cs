@@ -2,6 +2,5 @@ namespace View;
 
 public enum ViewType
 {
-    Simple,
-    Enhanced
+    Simple, Enhanced
 }

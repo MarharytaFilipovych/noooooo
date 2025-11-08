@@ -56,32 +56,21 @@ public class SimpleView : IGameView
         Console.WriteLine($"{playerLabel} moved: {move}");
     }
 
-    public void DisplayInvalidMove(Move move)
-    {
-        Console.WriteLine($"Invalid move: {move}");
-    }
+    public void DisplayInvalidMove(Move move) => Console.WriteLine($"Invalid move: {move}");
 
     public void DisplayGameEnd(GameState state, PlayerType winner)
     {
         UpdateBoard(state);
 
         Console.WriteLine("\n===================");
-        if (winner == PlayerType.None)
-        {
-            Console.WriteLine("Game ended in a draw!");
-        }
-        else
-        {
-            Console.WriteLine($"Player {winner} wins!");
-        }
+        Console.WriteLine(winner == PlayerType.None
+            ? "Game ended in a draw!" 
+            : $"Player {winner} wins!");
 
         Console.WriteLine("===================");
     }
 
-    public void DisplayMessage(string message)
-    {
-        Console.WriteLine(message);
-    }
+    public void DisplayMessage(string message) => Console.WriteLine(message);
 
     public string GetInput(string prompt)
     {

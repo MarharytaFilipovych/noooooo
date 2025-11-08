@@ -33,8 +33,7 @@ public class GameEventPublisher
         else MoveInvalid?.Invoke(move, previousPlayer);
     }
 
-    public void PublishHint(List<Move> validMoves) =>
-        HintRequested?.Invoke(validMoves);
+    public void PublishHint(List<Move> validMoves) => HintRequested?.Invoke(validMoves);
 
     private void PublishGameEnd(AtaxxGame game)
     {

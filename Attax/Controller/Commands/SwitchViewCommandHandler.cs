@@ -1,6 +1,8 @@
+using Attax.Commands;
+using Attax.Presenters;
+
 namespace Controller.Commands;
 
-using Controller.Presenters;
 using System;
 
 public class SwitchViewCommandHandler : ICommandHandler

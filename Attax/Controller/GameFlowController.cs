@@ -1,10 +1,10 @@
-namespace Controller;
-
-using Controller.Bot;
+using Attax.Bot;
+using Attax.Commands;
+using Attax.Presenters;
 using Controller.Commands;
-using Controller.Presenters;
 using Model.Game;
-using System;
+
+namespace Attax;
 
 public class GameFlowController
 {
@@ -12,23 +12,20 @@ public class GameFlowController
     private readonly BotOrchestrator _botOrchestrator;
     private readonly CommandProcessor _commandProcessor;
     private readonly GamePresenter _presenter;
-    private readonly GameUIController _uiController;
-    
+    private readonly GameUiController _uiController;
     private GameModeConfiguration _gameModeConfig;
 
-    public GameFlowController(
-        AtaxxGameWithEvents game,
-        BotOrchestrator botOrchestrator,
-        CommandProcessor commandProcessor,
-        GamePresenter presenter,
-        GameUIController uiController)
+    public GameFlowController(AtaxxGameWithEvents game, BotOrchestrator botOrchestrator,
+        CommandProcessor commandProcessor, GamePresenter presenter,
+        GameUiController uiController, GameModeConfiguration gameModeConfig)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _botOrchestrator = botOrchestrator ?? throw new ArgumentNullException(nameof(botOrchestrator));
         _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
         _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
         _uiController = uiController ?? throw new ArgumentNullException(nameof(uiController));
-        
+        _gameModeConfig = gameModeConfig;
+
         InitializeCommandHandlers();
     }
 
@@ -53,15 +50,11 @@ public class GameFlowController
         while (!_game.IsEnded)
         {
             if (IsCurrentPlayerBot())
-            {
                 _botOrchestrator.MakeBotMove(_game, _game.CurrentPlayer);
-            }
             else
             {
                 var input = _uiController.GetPlayerInput();
-                
-                if (!_commandProcessor.ProcessCommand(input))
-                    break;
+                if (!_commandProcessor.ProcessCommand(input)) break;
             }
         }
     }

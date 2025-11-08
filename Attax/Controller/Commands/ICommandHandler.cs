@@ -1,4 +1,4 @@
-namespace Controller.Commands;
+namespace Attax.Commands;
 
 public interface ICommandHandler
 {

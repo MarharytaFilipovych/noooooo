@@ -1,8 +1,7 @@
-namespace Controller.Presenters;
-
 using Model;
 using Model.Game;
-using System;
+
+namespace Attax.Presenters;
 
 public class GamePresenter
 {
@@ -11,9 +10,7 @@ public class GamePresenter
     
     private GameModeConfiguration? _gameModeConfig;
 
-    public GamePresenter(
-        AtaxxGameWithEvents game,
-        IViewSwitcher viewSwitcher)
+    public GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _viewSwitcher = viewSwitcher ?? throw new ArgumentNullException(nameof(viewSwitcher));
@@ -21,10 +18,8 @@ public class GamePresenter
         SubscribeToGameEvents();
     }
 
-    public void SetGameModeConfiguration(GameModeConfiguration config)
-    {
+    public void SetGameModeConfiguration(GameModeConfiguration config) =>
         _gameModeConfig = config ?? throw new ArgumentNullException(nameof(config));
-    }
 
     private void SubscribeToGameEvents()
     {
@@ -51,20 +46,17 @@ public class GamePresenter
 
     private void OnTurnChanged(PlayerType player)
     {
-        bool isBot = _gameModeConfig?.IsBot(player) ?? false;
+        var isBot = _gameModeConfig?.IsBot(player) ?? false;
         _viewSwitcher.CurrentView.DisplayTurn(player, isBot);
     }
 
     private void OnMoveMade(Move move, PlayerType player)
     {
-        bool isBot = _gameModeConfig?.IsBot(player) ?? false;
+        var isBot = _gameModeConfig?.IsBot(player) ?? false;
         _viewSwitcher.CurrentView.DisplayMove(move, player, isBot);
     }
 
-    private void OnMoveInvalid(Move move, PlayerType player)
-    {
-        _viewSwitcher.CurrentView.DisplayInvalidMove(move);
-    }
+    private void OnMoveInvalid(Move move, PlayerType player) => _viewSwitcher.CurrentView.DisplayInvalidMove(move);
 
     private void OnPlayerWon(PlayerType winner)
     {
@@ -87,8 +79,5 @@ public class GamePresenter
         _viewSwitcher.CurrentView.DisplayMessage($"Switched to {_viewSwitcher.CurrentViewType} view");
     }
 
-    public void DisplayMessage(string message)
-    {
-        _viewSwitcher.CurrentView.DisplayMessage(message);
-    }
+    public void DisplayMessage(string message) => _viewSwitcher.CurrentView.DisplayMessage(message);
 }

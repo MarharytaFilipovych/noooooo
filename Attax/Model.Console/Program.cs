@@ -1,11 +1,12 @@
+using Attax;
+using Attax.Bot;
+using Attax.Commands;
+using Attax.Presenters;
 using Controller;
-using Controller.Bot;
-using Controller.Commands;
-using Controller.Presenters;
 using Model.Game;
 using View;
 
-namespace Ataxx.Console;
+namespace Model.Console;
 
 public static class Program
 {
@@ -32,19 +33,19 @@ public static class Program
     {
         var random = new Random();
 
-        var game = new AtaxxGameWithEvents(DefaultBoardSize);
+        var game = new AtaxxGameWithEvents();
 
         IBotStrategy botStrategy = new RandomBotStrategy(random);
-        var botOrchestrator = new BotOrchestrator(botStrategy, BotThinkingDelayMs);
+        var botOrchestrator = new BotOrchestrator(botStrategy);
 
-        IViewFactory viewFactory = new ViewFactory();
-        IViewSwitcher viewSwitcher = new ViewSwitcher(viewFactory, InitialViewType);
+        var viewFactory = new ViewFactory();
+        var viewSwitcher = new ViewSwitcher(viewFactory);
 
         var initialView = viewFactory.CreateView(InitialViewType);
         IGameModeSelector gameModeSelector = new ConsoleGameModeSelector(initialView);
 
         var presenter = new GamePresenter(game, viewSwitcher);
-        var uiController = new GameUIController(viewSwitcher, gameModeSelector);
+        var uiController = new GameUiController(viewSwitcher, gameModeSelector);
 
         var commandProcessor = new CommandProcessor();
 
@@ -53,6 +54,6 @@ public static class Program
             botOrchestrator, 
             commandProcessor, 
             presenter,
-            uiController);
+            uiController, null);
     }
 }

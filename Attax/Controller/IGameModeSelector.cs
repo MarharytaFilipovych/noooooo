@@ -1,6 +1,6 @@
-namespace Controller;
-
 using Model.Game;
+
+namespace Attax;
 
 public interface IGameModeSelector
 {

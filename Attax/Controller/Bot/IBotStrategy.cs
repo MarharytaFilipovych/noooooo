@@ -1,9 +1,7 @@
 using Model;
-
-namespace Controller.Bot;
-
 using Model.Game;
-using System.Collections.Generic;
+
+namespace Attax.Bot;
 
 public interface IBotStrategy
 {

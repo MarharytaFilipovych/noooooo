@@ -1,6 +1,6 @@
 namespace Model.Game;
 
-using Model.Board;
+using Board;
 
 public class GameEndDetector
 {
@@ -40,14 +40,8 @@ public class GameEndDetector
     }
 }
 
-public readonly struct GameEndResult
+public readonly struct GameEndResult(bool isEnded, PlayerType winner)
 {
-    public bool IsEnded { get; }
-    public PlayerType Winner { get; }
-
-    public GameEndResult(bool isEnded, PlayerType winner)
-    {
-        IsEnded = isEnded;
-        Winner = winner;
-    }
+    public bool IsEnded { get; } = isEnded;
+    public PlayerType Winner { get; } = winner;
 }
