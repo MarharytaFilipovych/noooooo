@@ -1,20 +1,20 @@
-namespace Model.Game;
+using Model.Board;
+using Model.Game.DTOs;
+using Model.Game.End;
+using Model.PlayerType;
 
-using System;
-using System.Collections.Generic;
-using Board;
-using DTOs;
+namespace Model.Game.Game;
 
 public class AtaxxGame
 {
-    private readonly Board _board;
+    private readonly Board.Board _board;
     private readonly IBoardLayout _layout;
     private readonly MoveValidator _moveValidator;
     private readonly MoveExecutor _moveExecutor;
     private readonly GameEndDetector _endDetector;
     
-    public PlayerType CurrentPlayer { get; private set; }
-    public PlayerType Winner { get; private set; }
+    public PlayerType.PlayerType CurrentPlayer { get; private set; }
+    public PlayerType.PlayerType Winner { get; private set; }
     public bool IsEnded { get; private set; }
     public int TurnNumber { get; private set; }
     
@@ -23,7 +23,7 @@ public class AtaxxGame
 
     public AtaxxGame(int boardSize = 7)
     {
-        _board = new Board(boardSize);
+        _board = new Board.Board(boardSize);
         _layout = BoardLayoutFactory.GetRandomLayout();
         _moveValidator = new MoveValidator(_board);
         _moveExecutor = new MoveExecutor(_board);
@@ -32,14 +32,14 @@ public class AtaxxGame
 
     public AtaxxGame(int boardSize, IBoardLayout boardLayout)
     {
-        _board = new Board(boardSize);
+        _board = new Board.Board(boardSize);
         _layout = boardLayout;
         _moveValidator = new MoveValidator(_board);
         _moveExecutor = new MoveExecutor(_board);
         _endDetector = new GameEndDetector();
     }
 
-    private AtaxxGame(Board clonedBoard, IBoardLayout boardLayout)
+    private AtaxxGame(Board.Board clonedBoard, IBoardLayout boardLayout)
     {
         _board = clonedBoard;
         _layout = boardLayout;
@@ -51,13 +51,13 @@ public class AtaxxGame
     public void StartGame()
     {
         _board.Initialize(_layout);
-        CurrentPlayer = PlayerType.X;
-        Winner = PlayerType.None;
+        CurrentPlayer = PlayerType.PlayerType.X;
+        Winner = PlayerType.PlayerType.None;
         IsEnded = false;
         TurnNumber = 1;
     }
 
-    public bool MakeMove(Position from, Position to)
+    public bool MakeMove(Position.Position from, Position.Position to)
     {
         if (IsEnded) throw new InvalidOperationException("Game has ended");
 
@@ -71,9 +71,9 @@ public class AtaxxGame
 
     public List<Move> GetValidMoves() => _moveValidator.GetValidMoves(CurrentPlayer);
 
-    public List<Move> GetValidMoves(PlayerType player) => _moveValidator.GetValidMoves(player);
+    public List<Move> GetValidMoves(PlayerType.PlayerType player) => _moveValidator.GetValidMoves(player);
 
-    public Cell GetCell(Position pos) => _board.GetCell(pos);
+    public Cell GetCell(Position.Position pos) => _board.GetCell(pos);
 
     public Cell[,] GetBoard() => _board.GetCells();
 
@@ -88,7 +88,7 @@ public class AtaxxGame
         {
             for (var col = 0; col < BoardSize; col++)
             {
-                var cell = GetCell(new Position(row, col));
+                var cell = GetCell(new Position.Position(row, col));
                 cells[row, col] = new CellState(cell.OccupiedBy, cell.IsBlocked);
             }
         }

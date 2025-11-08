@@ -3,8 +3,9 @@ using Attax.Bot;
 using Attax.Commands;
 using Attax.Presenters;
 using Controller;
-using Model.Game;
+using Model.Game.Game;
 using View;
+using View.ViewFactory;
 
 namespace Model.Console;
 

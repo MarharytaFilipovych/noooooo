@@ -1,8 +1,9 @@
 using Attax.Bot;
 using Attax.Commands;
 using Attax.Presenters;
-using Controller.Commands;
 using Model.Game;
+using Model.Game.Game;
+using Model.Game.Mode;
 
 namespace Attax;
 
@@ -59,6 +60,5 @@ public class GameFlowController
         }
     }
 
-    private bool IsCurrentPlayerBot() =>
-        _gameModeConfig.IsBot(_game.CurrentPlayer);
+    private bool IsCurrentPlayerBot() => _gameModeConfig.IsBot(_game.CurrentPlayer);
 }

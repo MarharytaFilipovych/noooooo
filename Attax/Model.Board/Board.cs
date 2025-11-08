@@ -35,19 +35,19 @@ public class Board
             }
         }
 
-        _cells[0, 0].OccupyBy(PlayerType.X);
-        _cells[0, Size - 1].OccupyBy(PlayerType.O);
-        _cells[Size - 1, 0].OccupyBy(PlayerType.O);
-        _cells[Size - 1, Size - 1].OccupyBy(PlayerType.X);
+        _cells[0, 0].OccupyBy(PlayerType.PlayerType.X);
+        _cells[0, Size - 1].OccupyBy(PlayerType.PlayerType.O);
+        _cells[Size - 1, 0].OccupyBy(PlayerType.PlayerType.O);
+        _cells[Size - 1, Size - 1].OccupyBy(PlayerType.PlayerType.X);
     }
 
-    public bool IsValidPosition(Position pos)
+    public bool IsValidPosition(Position.Position pos)
     {
         return pos.Row >= 0 && pos.Row < Size && 
                pos.Col >= 0 && pos.Col < Size;
     }
 
-    public Cell GetCell(Position pos) =>
+    public Cell GetCell(Position.Position pos) =>
         !IsValidPosition(pos) 
             ? throw new ArgumentException($"Position {pos} is out of bounds") 
             : _cells[pos.Row, pos.Col];
@@ -65,13 +65,13 @@ public class Board
                 
                 switch (cell.OccupiedBy)
                 {
-                    case PlayerType.X:
+                    case PlayerType.PlayerType.X:
                         xCount++;
                         break;
-                    case PlayerType.O:
+                    case PlayerType.PlayerType.O:
                         oCount++;
                         break;
-                    case PlayerType.None:
+                    case PlayerType.PlayerType.None:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

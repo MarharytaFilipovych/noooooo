@@ -1,3 +1,5 @@
+using Model.PlayerType;
+
 namespace Model.Board;
 
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ public class MoveExecutor(Board board)
     private readonly Board _board = board ?? throw new ArgumentNullException(nameof(board));
     
     
-    public List<Position> ExecuteMove(Move move, PlayerType player)
+    public List<Position.Position> ExecuteMove(Move move, PlayerType.PlayerType player)
     {
         var toCell = _board.GetCell(move.To);
         toCell.OccupyBy(player);
@@ -21,9 +23,9 @@ public class MoveExecutor(Board board)
         return ConvertAdjacentPieces(move.To, player);
     }
 
-    private List<Position> ConvertAdjacentPieces(Position pos, PlayerType player)
+    private List<Position.Position> ConvertAdjacentPieces(Position.Position pos, PlayerType.PlayerType player)
     {
-        var converted = new List<Position>();
+        var converted = new List<Position.Position>();
         var opponent = player.GetOpponent();
 
         for (var dRow = -1; dRow <= 1; dRow++)
@@ -33,7 +35,7 @@ public class MoveExecutor(Board board)
                 if (dRow == 0 && dCol == 0)
                     continue;
 
-                var adjacentPos = new Position(pos.Row + dRow, pos.Col + dCol);
+                var adjacentPos = new Position.Position(pos.Row + dRow, pos.Col + dCol);
                 
                 if (!_board.IsValidPosition(adjacentPos))
                     continue;

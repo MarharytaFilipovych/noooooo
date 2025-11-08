@@ -1,26 +1,25 @@
-namespace Model.Game;
+using Model.Game.Game;
 
-using System;
-using System.Collections.Generic;
+namespace Model.Game.EventPublisher;
 
-public class GameEventPublisher
+public class GameEventPublisher : IGameEventPublisher
 {
     public event Action<Cell[,], string>? GameStarted;
-    public event Action<PlayerType>? PlayerWon;
+    public event Action<PlayerType.PlayerType>? PlayerWon;
     public event Action? GameDrawn;
-    public event Action<PlayerType>? TurnChanged;
-    public event Action<Move, PlayerType>? MoveMade;
-    public event Action<Move, PlayerType>? MoveInvalid;
+    public event Action<PlayerType.PlayerType>? TurnChanged;
+    public event Action<Move, PlayerType.PlayerType>? MoveMade;
+    public event Action<Move, PlayerType.PlayerType>? MoveInvalid;
     public event Action<Cell[,]>? BoardUpdated;
     public event Action<List<Move>>? HintRequested;
 
-    public void PublishGameStart(Cell[,] board, string layoutName, PlayerType currentPlayer)
+    public void PublishGameStart(Cell[,] board, string layoutName, PlayerType.PlayerType currentPlayer)
     {
         GameStarted?.Invoke(board, layoutName);
         TurnChanged?.Invoke(currentPlayer);
     }
 
-    public void PublishMoveResult(AtaxxGame game, Move move, PlayerType previousPlayer, bool success)
+    public void PublishMoveResult(AtaxxGame game, Move move, PlayerType.PlayerType previousPlayer, bool success)
     {
         if (success)
         {
@@ -37,7 +36,7 @@ public class GameEventPublisher
 
     private void PublishGameEnd(AtaxxGame game)
     {
-        if (game.Winner == PlayerType.None) GameDrawn?.Invoke();
+        if (game.Winner == PlayerType.PlayerType.None) GameDrawn?.Invoke();
         else PlayerWon?.Invoke(game.Winner);
     }
 }

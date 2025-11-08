@@ -1,5 +1,5 @@
-using Model;
-using Model.Game;
+using Model.Game.Game;
+using Model.PlayerType;
 
 namespace Attax.Bot;
 

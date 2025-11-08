@@ -1,3 +1,6 @@
+using Model.Game.Mode;
+using Model.PlayerType;
+
 namespace View;
 
 using Model;
@@ -26,8 +29,7 @@ public class SimpleView : IGameView
             for (var col = 0; col < state.BoardSize; col++)
             {
                 var cell = state.Cells[row, col];
-                var symbol = GetCellSymbol(cell);
-                Console.Write($"{symbol} ");
+                Console.Write($"{cell.ToSymbol()} ");
             }
 
             Console.WriteLine();
@@ -68,20 +70,5 @@ public class SimpleView : IGameView
             : $"Player {winner} wins!");
 
         Console.WriteLine("===================");
-    }
-
-    public void DisplayMessage(string message) => Console.WriteLine(message);
-
-    public string GetInput(string prompt)
-    {
-        Console.Write($"{prompt}: ");
-        return Console.ReadLine() ?? string.Empty;
-    }
-
-    private static char GetCellSymbol(CellState cell)
-    {
-        if (cell.IsBlocked) return '#';
-        if (cell.IsEmpty) return '.';
-        return cell.OccupiedBy == PlayerType.X ? 'X' : 'O';
     }
 }

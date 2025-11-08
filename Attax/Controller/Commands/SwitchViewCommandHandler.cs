@@ -1,18 +1,10 @@
-using Attax.Commands;
 using Attax.Presenters;
 
-namespace Controller.Commands;
+namespace Attax.Commands;
 
-using System;
-
-public class SwitchViewCommandHandler : ICommandHandler
+public class SwitchViewCommandHandler(GamePresenter presenter) : ICommandHandler
 {
-    private readonly GamePresenter _presenter;
-
-    public SwitchViewCommandHandler(GamePresenter presenter)
-    {
-        _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
-    }
+    private readonly GamePresenter _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
 
     public bool CanHandle(string command) => command == "switch";
 

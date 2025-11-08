@@ -1,6 +1,4 @@
-using Attax.Commands;
-
-namespace Controller.Commands;
+namespace Attax.Commands;
 
 public class QuitCommandHandler : ICommandHandler
 {

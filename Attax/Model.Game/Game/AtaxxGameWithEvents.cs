@@ -1,11 +1,11 @@
-namespace Model.Game;
+using Model.Game.EventPublisher;
+using Model.Position;
 
-using System;
-using System.Collections.Generic;
+namespace Model.Game.Game;
 
 public class AtaxxGameWithEvents : AtaxxGame
 {
-    private readonly GameEventPublisher _eventPublisher;
+    private readonly IGameEventPublisher _eventPublisher;
 
     public event Action<Cell[,], string>? GameStarted
     {
@@ -13,7 +13,7 @@ public class AtaxxGameWithEvents : AtaxxGame
         remove => _eventPublisher.GameStarted -= value;
     }
 
-    public event Action<PlayerType>? PlayerWon
+    public event Action<PlayerType.PlayerType>? PlayerWon
     {
         add => _eventPublisher.PlayerWon += value;
         remove => _eventPublisher.PlayerWon -= value;
@@ -25,19 +25,19 @@ public class AtaxxGameWithEvents : AtaxxGame
         remove => _eventPublisher.GameDrawn -= value;
     }
 
-    public event Action<PlayerType>? TurnChanged
+    public event Action<PlayerType.PlayerType>? TurnChanged
     {
         add => _eventPublisher.TurnChanged += value;
         remove => _eventPublisher.TurnChanged -= value;
     }
 
-    public event Action<Move, PlayerType>? MoveMade
+    public event Action<Move, PlayerType.PlayerType>? MoveMade
     {
         add => _eventPublisher.MoveMade += value;
         remove => _eventPublisher.MoveMade -= value;
     }
 
-    public event Action<Move, PlayerType>? MoveInvalid
+    public event Action<Move, PlayerType.PlayerType>? MoveInvalid
     {
         add => _eventPublisher.MoveInvalid += value;
         remove => _eventPublisher.MoveInvalid -= value;
@@ -55,15 +55,18 @@ public class AtaxxGameWithEvents : AtaxxGame
         remove => _eventPublisher.HintRequested -= value;
     }
 
-    public AtaxxGameWithEvents(int boardSize = 7) : base(boardSize)
+    public AtaxxGameWithEvents(int boardSize = 7, IGameEventPublisher? publisher = null) 
+        : base(boardSize)
     {
-        _eventPublisher = new GameEventPublisher();
+        _eventPublisher = publisher ?? new GameEventPublisher();
     }
 
-    public AtaxxGameWithEvents(int boardSize, Board.IBoardLayout layout) : base(boardSize, layout)
+    public AtaxxGameWithEvents(int boardSize, Board.IBoardLayout layout, IGameEventPublisher? publisher = null) 
+        : base(boardSize, layout)
     {
-        _eventPublisher = new GameEventPublisher();
+        _eventPublisher = publisher ?? new GameEventPublisher();
     }
+
 
     public void StartGameWithEvents()
     {
@@ -71,7 +74,7 @@ public class AtaxxGameWithEvents : AtaxxGame
         _eventPublisher.PublishGameStart(GetBoard(), LayoutName, CurrentPlayer);
     }
 
-    public bool MakeMoveWithEvents(Position from, Position to)
+    public bool MakeMoveWithEvents(Position.Position from, Position.Position to)
     {
         var move = new Move(from, to);
         var previousPlayer = CurrentPlayer;

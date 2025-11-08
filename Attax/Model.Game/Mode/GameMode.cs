@@ -1,4 +1,4 @@
-namespace Model.Game;
+namespace Model.Game.Mode;
 
 public enum GameMode
 {

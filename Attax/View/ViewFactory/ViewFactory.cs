@@ -1,7 +1,4 @@
-namespace View;
-
-using System;
-using System.Collections.Generic;
+namespace View.ViewFactory;
 
 public class ViewFactory : IViewFactory
 {
@@ -13,8 +10,7 @@ public class ViewFactory : IViewFactory
 
     public IGameView CreateView(ViewType type) =>
         _viewCreators.TryGetValue(type, out var creator)
-            ? creator()
-            : new SimpleView();
+            ? creator() : new SimpleView();
 
     public void RegisterView(ViewType type, Func<IGameView> creator) => 
         _viewCreators[type] = creator ?? throw new ArgumentNullException(nameof(creator));

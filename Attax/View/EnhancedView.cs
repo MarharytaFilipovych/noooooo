@@ -1,3 +1,6 @@
+using Model.Game.Mode;
+using Model.PlayerType;
+
 namespace View;
 
 using Model;
@@ -12,67 +15,83 @@ public class EnhancedView : IGameView
         Console.WriteLine("\nAtaxx - Enhanced View");
         Console.WriteLine("────────────────────────────────");
 
-        Console.Write("   ");
-        for (var col = 0; col < state.BoardSize; col++)
-        {
-            Console.Write($" {(char)('A' + col)} ");
-            if (col < state.BoardSize - 1) Console.Write(" ");
-        }
-
-        Console.WriteLine();
-
-        Console.Write("  ┌");
-        for (var col = 0; col < state.BoardSize; col++)
-        {
-            Console.Write("───");
-            if (col < state.BoardSize - 1) Console.Write("┬");
-        }
-
-        Console.WriteLine("┐");
+        PrintHeader(state.BoardSize);
+        PrintTopBorder(state.BoardSize);
 
         for (var row = 0; row < state.BoardSize; row++)
         {
-            Console.Write($"{row + 1} │");
-            for (var col = 0; col < state.BoardSize; col++)
-            {
-                var cell = state.Cells[row, col];
-                var symbol = GetCellSymbol(cell);
-                Console.Write($" {symbol} ");
-                if (col < state.BoardSize - 1) Console.Write("│");
-            }
-
-            Console.WriteLine("│");
-
+            PrintRow(row, state.Cells);
             if (row < state.BoardSize - 1)
-            {
-                Console.Write("  ├");
-                for (var col = 0; col < state.BoardSize; col++)
-                {
-                    Console.Write("───");
-                    if (col < state.BoardSize - 1) Console.Write("┼");
-                }
-
-                Console.WriteLine("┤");
-            }
+                PrintMiddleBorder(state.BoardSize);
         }
 
-        Console.Write("  └");
-        for (var col = 0; col < state.BoardSize; col++)
-        {
-            Console.Write("───");
-            if (col < state.BoardSize - 1) Console.Write("┴");
-        }
-
-        Console.WriteLine("┘");
+        PrintBottomBorder(state.BoardSize);
 
         Console.WriteLine($"\nScore │ X: {state.XCount} │ O: {state.OCount}");
+    }
+
+    private void PrintHeader(int boardSize)
+    {
+        Console.Write("   ");
+        for (var col = 0; col < boardSize; col++)
+        {
+            Console.Write($" {(char)('A' + col)} ");
+            if (col < boardSize - 1) Console.Write(" ");
+        }
+        Console.WriteLine();
+    }
+
+    private void PrintTopBorder(int boardSize)
+    {
+        Console.Write("  ┌");
+        for (var col = 0; col < boardSize; col++)
+        {
+            Console.Write("───");
+            if (col < boardSize - 1) Console.Write("┬");
+        }
+        Console.WriteLine("┐");
+    }
+
+    private void PrintMiddleBorder(int boardSize)
+    {
+        Console.Write("  ├");
+        for (var col = 0; col < boardSize; col++)
+        {
+            Console.Write("───");
+            if (col < boardSize - 1) Console.Write("┼");
+        }
+        Console.WriteLine("┤");
+    }
+
+    private void PrintBottomBorder(int boardSize)
+    {
+        Console.Write("  └");
+        for (var col = 0; col < boardSize; col++)
+        {
+            Console.Write("───");
+            if (col < boardSize - 1) Console.Write("┴");
+        }
+        Console.WriteLine("┘");
+    }
+
+    private void PrintRow(int rowIndex, CellState[,] cells)
+    {
+        var boardSize = cells.GetLength(0);
+        Console.Write($"{rowIndex + 1} │");
+        for (var col = 0; col < boardSize; col++)
+        {
+            var symbol = cells[rowIndex, col].ToSymbol();
+            Console.Write($" {symbol} ");
+            if (col < boardSize - 1) Console.Write("│");
+        }
+        Console.WriteLine("│");
     }
 
     public void DisplayGameStart(GameState state, string layoutName, GameMode mode)
     {
         Console.Clear();
         Console.WriteLine("════════════════════════════════");
-        Console.WriteLine($"    Game started");
+        Console.WriteLine("    Game started");
         Console.WriteLine($"    Layout: {layoutName}");
         Console.WriteLine($"    Mode: {mode}");
         Console.WriteLine("════════════════════════════════");
@@ -98,25 +117,11 @@ public class EnhancedView : IGameView
         UpdateBoard(state);
 
         Console.WriteLine("\n════════════════════════════════");
-        if (winner == PlayerType.None) Console.WriteLine("    Game ended in a draw!");
-        else Console.WriteLine($"    Player {winner} wins!");
-        
+        Console.WriteLine(winner == PlayerType.None 
+            ? "    Game ended in a draw!"
+            : $"    Player {winner} wins!");
+
 
         Console.WriteLine("════════════════════════════════");
-    }
-
-    public void DisplayMessage(string message) => Console.WriteLine($" {message}");
-
-    public string GetInput(string prompt)
-    {
-        Console.Write($"> {prompt}: ");
-        return Console.ReadLine() ?? string.Empty;
-    }
-
-    private static char GetCellSymbol(CellState cell)
-    {
-        if (cell.IsBlocked) return '#';
-        if (!cell.IsOccupied) return ' ';
-        return cell.OccupiedBy == PlayerType.X ? 'X' : 'O';
     }
 }

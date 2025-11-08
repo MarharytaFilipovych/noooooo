@@ -1,4 +1,4 @@
-namespace View;
+namespace View.ViewFactory;
 
 public interface IViewFactory
 {

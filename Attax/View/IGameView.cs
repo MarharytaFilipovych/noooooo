@@ -1,3 +1,6 @@
+using Model.Game.Mode;
+using Model.PlayerType;
+
 namespace View;
 
 using Model;
@@ -12,6 +15,15 @@ public interface IGameView
     void DisplayMove(Move move, PlayerType player, bool isBot);
     void DisplayInvalidMove(Move move);
     void DisplayGameEnd(GameState state, PlayerType winner);
-    void DisplayMessage(string message);
-    string GetInput(string prompt);
+    
+    void DisplayMessage(string message)
+    {
+        Console.WriteLine($" {message}");
+    }
+
+    string GetInput(string prompt)
+    {
+        Console.Write($"> {prompt}: ");
+        return Console.ReadLine() ?? string.Empty;
+    }
 }
