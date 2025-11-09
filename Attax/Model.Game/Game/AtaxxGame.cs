@@ -1,17 +1,21 @@
 using Model.Board;
+using Model.Board.Layouts;
 using Model.Game.DTOs;
 using Model.Game.End;
+using Model.Game.Mode;
 using Model.PlayerType;
 
 namespace Model.Game.Game;
 
 public class AtaxxGame
 {
+    private const int DefaultBoardSize = 7;
     private readonly Board.Board _board;
     private readonly IBoardLayout _layout;
     private readonly MoveValidator _moveValidator;
     private readonly MoveExecutor _moveExecutor;
     private readonly GameEndDetector _endDetector;
+    public GameModeConfiguration GameMode { get; set; } = GameModeConfiguration.CreatePvP();
     
     public PlayerType.PlayerType CurrentPlayer { get; private set; }
     public PlayerType.PlayerType Winner { get; private set; }
@@ -21,7 +25,7 @@ public class AtaxxGame
     public int BoardSize => _board.Size;
     public string LayoutName => _layout.Name;
 
-    public AtaxxGame(int boardSize = 7)
+    public AtaxxGame(int boardSize = DefaultBoardSize)
     {
         _board = new Board.Board(boardSize);
         _layout = BoardLayoutFactory.GetRandomLayout();
