@@ -7,7 +7,7 @@ public class MoveValidator(Board board)
 {
     private readonly Board _board = board ?? throw new ArgumentNullException(nameof(board));
 
-    public bool IsValidMove(Move move, PlayerType player)
+    public bool IsValidMove(Move move, PlayerType.PlayerType player)
     {
         if (!_board.IsValidPosition(move.From) || !_board.IsValidPosition(move.To))
             return false;
@@ -22,7 +22,7 @@ public class MoveValidator(Board board)
         return toCell.IsEmpty;
     }
 
-    public List<Move> GetValidMoves(PlayerType player)
+    public List<Move> GetValidMoves(PlayerType.PlayerType player)
     {
         var validMoves = new List<Move>();
         var playerPositions = GetPlayerPositions(player);
@@ -32,15 +32,15 @@ public class MoveValidator(Board board)
         return validMoves;
     }
 
-    private List<Position> GetPlayerPositions(PlayerType player)
+    private List<Position.Position> GetPlayerPositions(PlayerType.PlayerType player)
     {
-        var positions = new List<Position>();
+        var positions = new List<Position.Position>();
 
         for (var row = 0; row < _board.Size; row++)
         {
             for (var col = 0; col < _board.Size; col++)
             {
-                var pos = new Position(row, col);
+                var pos = new Position.Position(row, col);
                 var cell = _board.GetCell(pos);
 
                 if (cell.IsOccupied && cell.OccupiedBy == player)
@@ -51,7 +51,7 @@ public class MoveValidator(Board board)
         return positions;
     }
 
-    private List<Move> GetValidMovesFromPosition(Position from, PlayerType player)
+    private List<Move> GetValidMovesFromPosition(Position.Position from, PlayerType.PlayerType player)
     {
         var moves = new List<Move>();
 
@@ -62,7 +62,7 @@ public class MoveValidator(Board board)
                 if (dRow == 0 && dCol == 0)
                     continue;
 
-                var to = new Position(from.Row + dRow, from.Col + dCol);
+                var to = new Position.Position(from.Row + dRow, from.Col + dCol);
                 var move = new Move(from, to);
 
                 if (IsValidMove(move, player))

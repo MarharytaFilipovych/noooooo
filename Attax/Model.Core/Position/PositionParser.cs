@@ -1,4 +1,4 @@
-namespace Model;
+namespace Model.Position;
 
 public static class PositionParser
 {
@@ -17,7 +17,7 @@ public static class PositionParser
             if (colChar is < 'A' or > 'Z') 
                 throw new ArgumentException("Column must be a letter");
 
-            if (!int.TryParse(rowStr, out int row))
+            if (!int.TryParse(rowStr, out var row))
                 throw new ArgumentException("Row must be a number");
 
             var col = colChar - 'A';

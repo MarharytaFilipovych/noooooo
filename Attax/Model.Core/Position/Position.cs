@@ -1,4 +1,4 @@
-namespace Model;
+namespace Model.Position;
 
 public readonly struct Position(int row, int col)
 {

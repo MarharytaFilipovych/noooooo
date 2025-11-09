@@ -2,13 +2,13 @@
 
 public class Cell
 {
-    public PlayerType OccupiedBy { get; private set; } = PlayerType.None;
+    public PlayerType.PlayerType OccupiedBy { get; private set; } = PlayerType.PlayerType.None;
 
     public bool IsBlocked { get; private set; }
 
-    public bool IsEmpty => OccupiedBy == PlayerType.None && !IsBlocked;
+    public bool IsEmpty => OccupiedBy == PlayerType.PlayerType.None && !IsBlocked;
     
-    public bool IsOccupied => OccupiedBy != PlayerType.None;
+    public bool IsOccupied => OccupiedBy != PlayerType.PlayerType.None;
 
     public void MarkAsBlocked()
     {
@@ -19,9 +19,9 @@ public class Cell
         IsBlocked = true;
     }
 
-    public void OccupyBy(PlayerType player)
+    public void OccupyBy(PlayerType.PlayerType player)
     {
-        if (player == PlayerType.None)
+        if (player == PlayerType.PlayerType.None)
         {
             throw new ArgumentException("Cannot occupy cell with None player type");
         }
@@ -39,9 +39,9 @@ public class Cell
         OccupiedBy = player;
     }
 
-    public void ConvertTo(PlayerType player)
+    public void ConvertTo(PlayerType.PlayerType player)
     {
-        if (player == PlayerType.None)
+        if (player == PlayerType.PlayerType.None)
         {
             throw new ArgumentException("Cannot convert cell to None player type");
         }
@@ -66,7 +66,7 @@ public class Cell
             throw new InvalidOperationException("Cannot clear a blocked cell");
         }
         
-        OccupiedBy = PlayerType.None;
+        OccupiedBy = PlayerType.PlayerType.None;
     }
 
     public Cell Clone()
