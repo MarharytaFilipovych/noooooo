@@ -1,0 +1,64 @@
+﻿using Model;
+using Model.Game.Game;
+using Model.Game.Mode;
+using Model.PlayerType;
+using View;
+using ViewSwitcher;
+
+namespace ConsoleOutput;
+
+public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher) : IConsoleOutput
+{
+    private IGameView View => viewSwitcher.CurrentView;
+
+    public void ListenTo()
+    {
+        game.GameStarted += OnGameStarted;
+        game.TurnChanged += OnTurnChanged;
+        game.MoveMade += OnMoveMade;
+        game.MoveInvalid += OnMoveInvalid;
+        game.PlayerWon += OnPlayerWon;
+        game.GameDrawn += OnGameDrawn;
+        game.BoardUpdated += OnBoardUpdated;
+        game.HintRequested += OnHintRequested;
+        game.ModeSet += OnModeSet;
+        viewSwitcher.ViewSelected += OnViewSelected;
+    }
+
+    private void OnHintRequested(List<Move> moves) => 
+        viewSwitcher.CurrentView.DisplayHint(moves);
+
+    private void OnModeSet(GameMode gameMode) =>
+        View.DisplayMessage(gameMode == GameMode.PvE ? "You are Player X, Bot is Player O" : "ENJOY!");
+    
+    private void OnGameStarted(Cell[,] board, string layoutName) =>
+        View.DisplayGameStart(game.GetGameState(), layoutName, game.GameMode.Mode);
+
+    private void OnBoardUpdated(Cell[,] board) => View.UpdateBoard(game.GetGameState());
+
+    private void OnTurnChanged(PlayerType player)
+    {
+        var isBot = game.GameMode.IsBot(player);
+        View.DisplayTurn(player, isBot);
+    }
+
+    private void OnMoveMade(Move move, PlayerType player)
+    {
+        var isBot = game.GameMode.IsBot(player);
+        View.DisplayMove(move, player, isBot);
+    }
+
+    private void OnMoveInvalid(Move move, PlayerType player) => View.DisplayInvalidMove(move);
+
+    private void OnPlayerWon(PlayerType winner) =>
+        View.DisplayGameEnd(game.GetGameState(), winner);
+
+    private void OnGameDrawn() =>
+        View.DisplayGameEnd( game.GetGameState(), PlayerType.None);
+
+    private void OnViewSelected()
+    {
+        View.UpdateBoard(game.GetGameState());
+        View.DisplayMessage($"Switched to {viewSwitcher.CurrentViewType} view");
+    }
+}

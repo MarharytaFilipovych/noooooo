@@ -8,9 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Controller\Controller.csproj" />
       <ProjectReference Include="..\Model.Core\Model.Core.csproj" />
-      <ProjectReference Include="..\View\View.csproj" />
+      <ProjectReference Include="..\GameView\GameView.csproj" />
     </ItemGroup>
 
 </Project>

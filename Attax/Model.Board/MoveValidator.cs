@@ -15,8 +15,7 @@ public class MoveValidator(Board board)
         if (!move.IsValid) return false;
 
         var fromCell = _board.GetCell(move.From);
-        if (!fromCell.IsOccupied || fromCell.OccupiedBy != player)
-            return false;
+        if (!fromCell.IsOccupied || fromCell.OccupiedBy != player) return false;
 
         var toCell = _board.GetCell(move.To);
         return toCell.IsEmpty;

@@ -9,7 +9,11 @@
 
 <ItemGroup>
     <ProjectReference Include="..\Model.Game\Model.Game.csproj" />
-    <ProjectReference Include="..\View\View.csproj" />
+    <ProjectReference Include="..\GameView\GameView.csproj" />
+</ItemGroup>
+
+<ItemGroup>
+  <Folder Include="Presenters\" />
 </ItemGroup>
 
 </Project>
