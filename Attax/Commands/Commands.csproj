@@ -8,8 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Command\Command.csproj" />
-      <ProjectReference Include="..\Model.Core\Model.Core.csproj" />
-      <ProjectReference Include="..\Model.Game\Model.Game.csproj" />
+      <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\Game\Game.csproj" />
       <ProjectReference Include="..\ViewSwitcher\ViewSwitcher.csproj" />
     </ItemGroup>
 

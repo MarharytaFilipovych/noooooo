@@ -2,6 +2,7 @@ using Model.Game.Mode;
 using Model.PlayerType;
 using Model;
 using Model.Game.DTOs;
+using Stats;
 
 namespace View;
 
@@ -20,4 +21,6 @@ public interface IGameView
     string DisplayMessageForAnswer(string message);
     void DisplayError(string error);
     string DisplayModeSelection();
+    void DisplayStatistics(GameStatistics statistics);
+    void DisplayElapsedTimeOutMessage(PlayerType playerType);
 }

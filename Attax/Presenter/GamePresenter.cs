@@ -20,7 +20,6 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
         game.StartGame();
         GameLoop();
     }
-
     
     private void GameLoop()
     {
@@ -37,6 +36,7 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
                 if (result == ExecuteResult.Error) View.DisplayError(error!);
             }
         }
+        game.EndGame();
     }
 
     private bool IsCurrentPlayerBot() => game.GameMode.IsBot(game.CurrentPlayer);

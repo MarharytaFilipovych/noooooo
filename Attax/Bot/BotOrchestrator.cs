@@ -16,6 +16,6 @@ public class BotOrchestrator(IBotStrategy strategy, int thinkingDelayMs = 500)
         if (validMoves.Count == 0) return;
 
         var selectedMove = _strategy.SelectMove(validMoves, game, botPlayer);
-        game.MakeMoveWithEvents(selectedMove.From, selectedMove.To);
+        game.MakeMove(selectedMove.From, selectedMove.To);
     }
 }

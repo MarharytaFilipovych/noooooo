@@ -1,5 +1,6 @@
 using Model.Game.Mode;
 using Model.PlayerType;
+using Stats;
 
 namespace View;
 
@@ -175,6 +176,33 @@ public class EnhancedView : IGameView
         Console.Write("Enter choice (1 or 2)❤️❤️❤️");
 
         return Console.ReadLine() ?? string.Empty;
+    }
+    
+    public void DisplayStatistics(GameStatistics stats)
+    {
+        const int valueWidth = 8;
+
+        Console.WriteLine("\n╔════════════════════════════════════════╗");
+        Console.WriteLine("║           🎮 Game Statistics 🎮          ║");
+        Console.WriteLine("╠════════════════════════════════════════╣");
+
+        Console.WriteLine($"║ 🕹 Total Games:     {stats.GamesPlayed,valueWidth}             ║");
+        Console.WriteLine($"║ ❌ Player X Wins:   {stats.PlayerXWins,valueWidth}             ║");
+        Console.WriteLine($"║ ⭘ Player O Wins:   {stats.PlayerOWins,valueWidth}             ║");
+        Console.WriteLine($"║ ⚖ Draws:           {stats.Draws,valueWidth}             ║");
+        Console.WriteLine($"║ 📊 Avg Moves:       {stats.AverageMoveCount,valueWidth:F1}           ║");
+        Console.WriteLine($"║ 🗓 Last Played:     {stats.LastPlayed:yyyy-MM-dd}         ║");
+
+        Console.WriteLine("╚════════════════════════════════════════╝\n");
+    }
+    
+    public void DisplayElapsedTimeOutMessage(PlayerType playerType)
+    {
+        Console.WriteLine("\n╔════════════════════════════════════════════╗");
+        Console.WriteLine("║          ⏰ Turn Time Expired! ⏰          ║");
+        Console.WriteLine($"║  Player {playerType} did not move in time! ║");
+        Console.WriteLine("║  A random move has been applied automatically. ║");
+        Console.WriteLine("╚════════════════════════════════════════════╝");
     }
 }
 

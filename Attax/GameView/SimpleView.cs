@@ -1,5 +1,6 @@
 using Model.Game.Mode;
 using Model.PlayerType;
+using Stats;
 
 namespace View;
 
@@ -106,10 +107,28 @@ public class SimpleView : IGameView
         return Console.ReadLine() ?? string.Empty;
     }
 
+    public void DisplayStatistics(GameStatistics stats)
+    {
+        const int labelWidth = 15;
+        const int valueWidth = 6;
+
+        Console.WriteLine("\n╔══════════ Game Statistics ══════════╗");
+        Console.WriteLine($"│ {"Total Games",-labelWidth} {stats.GamesPlayed,valueWidth} │");
+        Console.WriteLine($"│ {"Player X Wins",-labelWidth} {stats.PlayerXWins,valueWidth} │");
+        Console.WriteLine($"│ {"Player O Wins",-labelWidth} {stats.PlayerOWins,valueWidth} │");
+        Console.WriteLine($"│ {"Draws",-labelWidth} {stats.Draws,valueWidth} │");
+        Console.WriteLine($"│ {"Avg Moves",-labelWidth} {stats.AverageMoveCount,valueWidth:F1} │");
+        Console.WriteLine($"│ {"Last Played",-labelWidth} {stats.LastPlayed:yyyy-MM-dd} │");
+        Console.WriteLine("╚══════════════════════════════════════╝");
+    }
+
     public string GetInput() 
     {
         Console.Write("> ");
         return Console.ReadLine() ?? string.Empty;
     }
+    
+    public void DisplayElapsedTimeOutMessage(PlayerType playerType) =>
+        Console.WriteLine($"Time's up for {playerType.ToString()}! A random move has been made automatically.");
 }
 

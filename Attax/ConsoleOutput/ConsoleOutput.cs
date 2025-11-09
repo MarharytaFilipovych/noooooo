@@ -2,6 +2,7 @@
 using Model.Game.Game;
 using Model.Game.Mode;
 using Model.PlayerType;
+using Stats;
 using View;
 using ViewSwitcher;
 
@@ -22,6 +23,8 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         game.BoardUpdated += OnBoardUpdated;
         game.HintRequested += OnHintRequested;
         game.ModeSet += OnModeSet;
+        game.StatsRequested += OnStatsRequested;
+        game.TurnTimedOut += OnTurnTimeOut;
         viewSwitcher.ViewSelected += OnViewSelected;
     }
 
@@ -61,4 +64,8 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         View.UpdateBoard(game.GetGameState());
         View.DisplayMessage($"Switched to {viewSwitcher.CurrentViewType} view");
     }
+
+    private void OnStatsRequested(GameStatistics statistics) => View.DisplayStatistics(statistics);
+
+    private void OnTurnTimeOut(PlayerType playerType) => View.DisplayElapsedTimeOutMessage(playerType);
 }

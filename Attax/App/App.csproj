@@ -9,7 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ConsoleOutput\ConsoleOutput.csproj" />
-      <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\DIContainer\DIContainer.csproj" />
       <ProjectReference Include="..\Presenter\Presenter.csproj" />
     </ItemGroup>
 
