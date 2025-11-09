@@ -1,9 +1,9 @@
 using Model.Board;
 using Model.PlayerType;
 
-namespace Model.Game.End;
+namespace Model.Game;
 
-public class GameEndDetector : IGameEndDetector
+public class GameEndDetector 
 {
     public GameEndResult CheckGameEnd(Board.Board board, MoveValidator validator, PlayerType.PlayerType currentPlayer)
     {
@@ -39,5 +39,11 @@ public class GameEndDetector : IGameEndDetector
 
         return new GameEndResult(false, PlayerType.PlayerType.None);
     }
+}
+
+public readonly struct GameEndResult(bool isEnded, PlayerType.PlayerType winner)
+{
+    public bool IsEnded { get; } = isEnded;
+    public PlayerType.PlayerType Winner { get; } = winner;
 }
 

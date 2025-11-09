@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Model.Core\Model.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="End\" />
+    </ItemGroup>
+
 </Project>

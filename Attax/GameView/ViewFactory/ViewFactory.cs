@@ -4,11 +4,7 @@ namespace View.ViewFactory;
 
 public class ViewFactory : IViewFactory
 {
-    private readonly Dictionary<ViewType, Func<IGameView>> _viewCreators = new()
-    {
-        { ViewType.Simple, () => new SimpleView() },
-        { ViewType.Enhanced, () => new EnhancedView() }
-    };
+    private readonly Dictionary<ViewType, Func<IGameView>> _viewCreators = new();
 
     public IGameView CreateView(ViewType type) =>
         _viewCreators.TryGetValue(type, out var creator)

@@ -9,7 +9,7 @@ using ViewSwitcher;
 namespace Presenter;
 
 public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
-    BotOrchestrator botOrchestrator, CommandProcessor commandProcessor)
+    BotOrchestrator botOrchestrator, CommandProcessor commandProcessor) : IGamePresenter
 {
     private IGameView View => viewSwitcher.CurrentView;
 

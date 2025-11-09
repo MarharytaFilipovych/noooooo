@@ -6,12 +6,8 @@ namespace ViewSwitcher;
 
 public class ViewSwitcher : IViewSwitcher
 {
-
     private readonly IViewFactory _viewFactory;
-    private readonly List<ViewType> _availableViews;
-
     public IGameView CurrentView { get; private set; }
-
     public ViewType CurrentViewType { get; private set; }
 
     public ViewSwitcher(IViewFactory viewFactory, ViewType initialViewType = ViewType.Simple)
@@ -19,10 +15,9 @@ public class ViewSwitcher : IViewSwitcher
         CurrentViewType = initialViewType;
         
         _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
-        _availableViews = _viewFactory.GetAvailableViews().ToList();
 
-        if (_availableViews.Count == 0) throw new InvalidOperationException("No views registered");
-
+        if ( _viewFactory.GetAvailableViews().Count == 0) 
+            throw new InvalidOperationException("No views registered");
         
         CurrentView = _viewFactory.CreateView(CurrentViewType);
     }
@@ -32,7 +27,6 @@ public class ViewSwitcher : IViewSwitcher
         CurrentViewType = viewType;
         CurrentView = _viewFactory.CreateView(CurrentViewType);
         ViewSelected?.Invoke();
-
     }
 
     public event Action? ViewSelected;

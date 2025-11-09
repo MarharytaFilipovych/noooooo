@@ -7,7 +7,7 @@ public class HelpCommandExecutor(List<ICommandDefinition> commands) : ICommandEx
 {
     public ExecuteResult Execute(HelpCommand command)
     {
-        commands.ForEach(c => Console.WriteLine($"• {c.Description}. Usage: {c.Usage}"));
+        commands.ForEach(c => Console.WriteLine($"* {c.Description}. Usage: {c.Usage}"));
         return ExecuteResult.Continue;
     }
 }
