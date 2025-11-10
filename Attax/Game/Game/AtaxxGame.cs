@@ -1,87 +1,78 @@
-using Model.Board;
 using Model.Board.Layouts;
+using Model.Game.CareTaker;
 using Model.Game.DTOs;
 using Model.Game.Mode;
 using Model.Game.TurnTimer;
 using Model.PlayerType;
+using Move.Executor;
+using Move.Generator;
+using Move.Validator;
 using Stats;
-using Stats.Repository;
+using Stats.Tracker;
 
 namespace Model.Game.Game;
 
 public class AtaxxGame
 {
+    private const int UndoTimeWindowSeconds = 3;
     protected const int DefaultBoardSize = 7;
-    protected GameStatistics Statistics;
-    private readonly Board.Board _board;
+    
+    private Board.Board _board;
     private readonly ITurnTimer _turnTimer;
+    private readonly ICareTaker _careTaker;
     private readonly IBoardLayout _layout;
-    private readonly MoveValidator _moveValidator;
-    private readonly MoveExecutor _moveExecutor;
+    private readonly IMoveValidator _moveValidator;
+    private readonly IMoveExecutor _moveExecutor;
+    private readonly IMoveGenerator _moveGenerator;
     private readonly GameEndDetector _endDetector;
-    private readonly IStatisticsRepository _statisticsRepository;
-    private readonly Random _random;
+    private readonly IStatsTracker _statsTracker;
+    private readonly GameProgress _progress;
     
     public GameModeConfiguration GameMode { get; set; } = GameModeConfiguration.CreatePvP();
-    public PlayerType.PlayerType CurrentPlayer { get; private set; }
-    public PlayerType.PlayerType Winner { get; private set; }
-    public bool IsEnded { get; private set; }
-    public int TurnNumber { get; private set; }
+    protected GameStatistics Statistics => _statsTracker.GetStatistics();
     
+    public PlayerType.PlayerType CurrentPlayer => _progress.CurrentPlayer;
+    public PlayerType.PlayerType Winner => _progress.Winner;
+    public bool IsEnded => _progress.IsEnded;
+    public int TurnNumber => _progress.TurnNumber;
     public int BoardSize => _board.Size;
     public string LayoutName => _layout.Name;
 
-    public AtaxxGame(IStatisticsRepository statisticsRepository, ITurnTimer turnTimer, 
-        int boardSize = DefaultBoardSize)
+    public AtaxxGame(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator, 
+        IMoveExecutor executor, IMoveGenerator generator, int boardSize = DefaultBoardSize, IBoardLayout? layout = null)
     {
-        _statisticsRepository = statisticsRepository;
-        Statistics = _statisticsRepository.LoadStatistics();
+        _statsTracker = statsTracker;
         _turnTimer = turnTimer;
+        _moveValidator = validator;
+        _moveExecutor = executor;
+        _moveGenerator = generator;
         _board = new Board.Board(boardSize);
-        _layout = BoardLayoutFactory.GetRandomLayout();
-        _moveValidator = new MoveValidator(_board);
-        _moveExecutor = new MoveExecutor(_board);
+        _layout = layout ?? BoardLayoutFactory.GetRandomLayout();
+        _careTaker = new CareTaker.CareTaker(this);
         _endDetector = new GameEndDetector();
-        _random = new Random();
+        _progress = new GameProgress();
         
         _turnTimer.TimeoutOccurred += HandleTimeout;
     }
+    
 
-    public AtaxxGame(IStatisticsRepository statisticsRepository, ITurnTimer turnTimer, 
-        int boardSize, IBoardLayout boardLayout)
+    private AtaxxGame(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator, 
+        IMoveExecutor executor, IMoveGenerator generator, Board.Board clonedBoard, IBoardLayout layout)
     {
-        _board = new Board.Board(boardSize);
-        _statisticsRepository = statisticsRepository;
-        Statistics = _statisticsRepository.LoadStatistics();
+        _statsTracker = statsTracker;
         _turnTimer = turnTimer;
-        _layout = boardLayout;
-        _moveValidator = new MoveValidator(_board);
-        _moveExecutor = new MoveExecutor(_board);
-        _endDetector = new GameEndDetector();
-        _random = new Random();
-        
-        _turnTimer.TimeoutOccurred += HandleTimeout;
-        
-    }
-
-    private AtaxxGame(IStatisticsRepository statisticsRepository, ITurnTimer turnTimer,
-        Board.Board clonedBoard, IBoardLayout boardLayout)
-    {
-        _statisticsRepository = statisticsRepository;
-        Statistics = _statisticsRepository.LoadStatistics();
-        _turnTimer = turnTimer;
+        _moveValidator = validator;
+        _moveExecutor = executor;
+        _moveGenerator = generator;
         _board = clonedBoard;
-        _layout = boardLayout;
-        _moveValidator = new MoveValidator(_board);
-        _moveExecutor = new MoveExecutor(_board);
+        _layout = layout;
+        _careTaker = new CareTaker.CareTaker(this);
         _endDetector = new GameEndDetector();
-        _random = new Random();
+        _progress = new GameProgress();
         
         _turnTimer.TimeoutOccurred += HandleTimeout;
-        
     }
-
-
+    
     protected virtual void HandleTimeout()
     {
         if (IsEnded) return;
@@ -91,10 +82,7 @@ public class AtaxxGame
     public virtual void StartGame()
     {
         _board.Initialize(_layout);
-        CurrentPlayer = PlayerType.PlayerType.X;
-        Winner = PlayerType.PlayerType.None;
-        IsEnded = false;
-        TurnNumber = 1;
+        _progress.Initialize();
         _turnTimer.StartTurn();
     }
 
@@ -102,41 +90,35 @@ public class AtaxxGame
     {
         if (IsEnded) throw new InvalidOperationException("Game has ended");
 
-        var move = new Move(from, to);
+        var move = new Move.Move(from, to);
         
-        if (!_moveValidator.IsValidMove(move, CurrentPlayer)) return false;
+        if (!_moveValidator.IsValidMove(_board, move, CurrentPlayer))
+            return false;
+
+        if (GameMode.Mode == Mode.GameMode.PvE && !GameMode.IsBot(CurrentPlayer)) 
+            _careTaker.BackUp();
 
         ExecuteMove(move);
         
-        if (!IsEnded)
-        {
+        if (!IsEnded) 
             _turnTimer.ResetTurn();
-        }
-        else
-        {
+        else 
             _turnTimer.StopTurn();
-        }
         
         return true;
     }
 
     private void MakeRandomMove()
     {
-        var validMoves = GetValidMoves();
-        
-        if (validMoves.Count == 0)
-        {
-            _turnTimer.StopTurn();
-            return;
-        }
-
-        var randomMove = validMoves[_random.Next(validMoves.Count)];
+        var randomMove = _moveGenerator.GenerateMove(_board, CurrentPlayer);
+        if (randomMove == null) return;
         MakeMove(randomMove.From, randomMove.To);
     }
 
-    public List<Move> GetValidMoves() => _moveValidator.GetValidMoves(CurrentPlayer);
+    public List<Move.Move> GetValidMoves() => _moveValidator.GetValidMoves(_board, CurrentPlayer);
 
-    public List<Move> GetValidMoves(PlayerType.PlayerType player) => _moveValidator.GetValidMoves(player);
+    public List<Move.Move> GetValidMoves(PlayerType.PlayerType player) => 
+        _moveValidator.GetValidMoves(_board, player);
 
     public Cell GetCell(Position.Position pos) => _board.GetCell(pos);
 
@@ -162,25 +144,21 @@ public class AtaxxGame
             oCount, IsEnded, Winner, LayoutName);
     }
 
-    private void ExecuteMove(Move move)
+    private void ExecuteMove(Move.Move move)
     {
-        _moveExecutor.ExecuteMove(move, CurrentPlayer);
+        _moveExecutor.ExecuteMove(_board, move, CurrentPlayer);
         SwitchPlayer();
         CheckGameEnd();
     }
 
     private void SwitchPlayer()
     {
-        var nextPlayer = CurrentPlayer.GetOpponent();
-        CurrentPlayer = nextPlayer;
-        TurnNumber++;
+        _progress.AdvanceTurn();
         
         var opponent = CurrentPlayer.GetOpponent();
-        if (_moveValidator.GetValidMoves(CurrentPlayer).Count == 0 && 
-            _moveValidator.GetValidMoves(opponent).Count > 0)
-        {
-            CurrentPlayer = opponent;
-        }
+        if (_moveValidator.GetValidMoves(_board, CurrentPlayer).Count == 0 && 
+            _moveValidator.GetValidMoves(_board, opponent).Count > 0) 
+            _progress.AdvanceTurn();
     }
 
     private void CheckGameEnd()
@@ -189,11 +167,35 @@ public class AtaxxGame
         
         if (result.IsEnded)
         {
-            IsEnded = true;
-            Winner = result.Winner;
+            _progress.EndGame(result.Winner);
             _turnTimer.StopTurn();
-            Statistics = Statistics.AddGame(Winner, TurnNumber);
-            _statisticsRepository.SaveStatistics(Statistics);
+            _statsTracker.RecordGame(result.Winner, TurnNumber);
         }
+    }
+    
+    public bool UndoLastMove() =>
+        GameMode.Mode == Mode.GameMode.PvE && _careTaker.Undo(UndoTimeWindowSeconds);
+    
+    public IMemento Save() => 
+        new GameMemento(_board.Clone(), CurrentPlayer, TurnNumber);
+
+    public void Restore(IMemento memento)
+    {
+        if (memento is not GameMemento saved) 
+            throw new InvalidOperationException("Invalid memento type");
+
+        _board = saved.Board;
+        _progress.Restore(saved.CurrentPlayer, saved.TurnNumber);
+        _turnTimer.ResetTurn();
+    }
+    
+    private class GameMemento(
+        Board.Board board, 
+        PlayerType.PlayerType currentPlayer,
+        int turnNumber) : IMemento
+    {
+        internal Board.Board Board { get; } = board;
+        internal PlayerType.PlayerType CurrentPlayer { get; } = currentPlayer;
+        internal int TurnNumber { get; } = turnNumber;
     }
 }

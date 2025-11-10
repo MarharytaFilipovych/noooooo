@@ -1,24 +1,28 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Stats.Repository;
 
-public class JsonStatisticsRepository(string? filePath = null) : IStatisticsRepository
+public class JsonStatisticsRepository : IStatisticsRepository
 {
-    private string FilePath => filePath ?? "statistics.json";
+    private readonly string? _filePath;
+    private const string FileName = "statistics.json";
+    private const string DirectoryName = "BeautifulStats";
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public JsonStatisticsRepository(string? filePath = null)
     {
-        WriteIndented = true
-    };
+        if (!Directory.Exists(DirectoryName)) Directory.CreateDirectory(DirectoryName);
 
+        _filePath = GetFilePath(filePath ?? FileName);
+    }
 
     public GameStatistics LoadStatistics()
     {
-        if (!File.Exists(FilePath)) return GameStatistics.Empty;
+        if (!File.Exists(_filePath)) return GameStatistics.Empty;
 
         try
         {
-            var json = File.ReadAllText(FilePath );
+            var json = File.ReadAllText(_filePath);
             return JsonSerializer.Deserialize<GameStatistics>(json) ?? GameStatistics.Empty;
         }
         catch (Exception ex)
@@ -33,7 +37,7 @@ public class JsonStatisticsRepository(string? filePath = null) : IStatisticsRepo
         try
         {
             var json = JsonSerializer.Serialize(statistics, JsonOptions);
-            File.WriteAllText(filePath!, json);
+            File.WriteAllText(_filePath!, json);
         }
         catch (Exception ex)
         {
@@ -43,6 +47,31 @@ public class JsonStatisticsRepository(string? filePath = null) : IStatisticsRepo
 
     public void ResetStatistics()
     {
-        if (File.Exists(FilePath )) File.Delete(FilePath );
+        if (File.Exists(_filePath)) File.Delete(_filePath);
+    }
+    
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    { 
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+    
+    private static string GetFilePath(string filepath) => 
+        Path.Combine(GetProjectRoot(), DirectoryName, $"{filepath}.json");
+    
+    private static string GetProjectRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        var projectName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        var csprojFile = $"{projectName}.csproj";
+
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, csprojFile)))
+        {
+            directory = directory.Parent;
+        }
+
+        return directory?.FullName ?? AppContext.BaseDirectory;
     }
 }
+

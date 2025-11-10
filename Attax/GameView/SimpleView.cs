@@ -4,7 +4,6 @@ using Stats;
 
 namespace View;
 
-using Model;
 using Model.Game.DTOs;
 using System;
 
@@ -59,13 +58,13 @@ public class SimpleView : IGameView
         Console.WriteLine($"\n{playerLabel}'s turn");
     }
 
-    public void DisplayMove(Move move, PlayerType player, bool isBot)
+    public void DisplayMove(Move.Move move, PlayerType player, bool isBot)
     {
         var playerLabel = isBot ? $"Bot ({player})" : $"Player {player}";
         Console.WriteLine($"{playerLabel} moved: {move}");
     }
 
-    public void DisplayInvalidMove(Move move) => Console.WriteLine($"Invalid move: {move}");
+    public void DisplayInvalidMove(Move.Move move) => Console.WriteLine($"Invalid move: {move}");
 
     public void DisplayGameEnd(GameState state, PlayerType winner)
     {
@@ -79,19 +78,13 @@ public class SimpleView : IGameView
         Console.WriteLine("===================");
     }
     
-    public void DisplayHint(List<Move> validMoves)
+    public void DisplayHint(List<Move.Move> validMoves)
     {
         Console.WriteLine("\nValid moves:");
         validMoves.ForEach(move => Console.WriteLine($"  {move}"));
     }
 
     public void DisplayMessage(string message) => Console.WriteLine($" {message}");
-
-    public string DisplayMessageForAnswer(string message)
-    {
-        Console.Write($" {message}: ");
-        return Console.ReadLine() ?? string.Empty;
-    }
 
     public void DisplayError(string error) =>Console.WriteLine($"Error: {error}");
 
@@ -129,6 +122,14 @@ public class SimpleView : IGameView
     }
     
     public void DisplayElapsedTimeOutMessage(PlayerType playerType) =>
-        Console.WriteLine($"Time's up for {playerType.ToString()}! A random move has been made automatically.");
+        Console.WriteLine($"Time's up for {playerType.ToString()}!" +
+                          $" A random move has been made automatically.");
+    
+    public void DisplayUndo(bool success, PlayerType player)
+    {
+        Console.WriteLine(success
+            ? $"Undo successful! Player {player}'s last move was reverted."
+            : $"Undo failed! No move to revert for Player {player}.");
+    }
 }
 

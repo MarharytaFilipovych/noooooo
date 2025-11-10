@@ -1,5 +1,7 @@
 using Bot;
 using Commands;
+using Commands.CommandDefinition;
+using Commands.CommandExecutor;
 using Model.Game.Game;
 using Model.Game.Mode;
 using Model.PlayerType;
@@ -25,8 +27,7 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
     {
         while (!game.IsEnded)
         {
-            if (IsCurrentPlayerBot())
-                botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
+            if (IsCurrentPlayerBot()) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
             else
             {
                 var input = View.GetInput();
@@ -51,11 +52,17 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
         game.GameMode = input switch
         {
             "1" => GameModeConfiguration.CreatePvP(),
-            "2" => GameModeConfiguration.CreatePvE(PlayerType.X),
+            "2" => CreatePvEWithUndo(),
             _ => GameModeConfiguration.CreatePvP()
         };
         
         game.SetMode();
     }
-    
+        
+    private GameModeConfiguration CreatePvEWithUndo()
+    {
+        var config = GameModeConfiguration.CreatePvE(PlayerType.X);
+        commandProcessor.Register(new UndoCommandDefinition(), new UndoCommandExecutor(game));
+        return config;
+    }
 }

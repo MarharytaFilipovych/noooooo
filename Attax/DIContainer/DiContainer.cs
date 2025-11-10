@@ -6,7 +6,11 @@ public class DiContainer : IDiContainer
     
     private readonly Dictionary<Type, object> _typesToObjects = new();
     
-    
+    public void RegisterInstance<T>(T instance)
+    {
+        _typesToObjects[typeof(T)] = instance!;
+    }
+
     public void Register<TInterface, TImplementation>(Scope scope) where TImplementation : TInterface
     {
         _typesToImplementation[typeof(TInterface)] = new Binding()
@@ -19,25 +23,26 @@ public class DiContainer : IDiContainer
 
     private object Resolve(Type type)
     {
-        var binding = _typesToImplementation[type];
-
+        if (_typesToObjects.TryGetValue(type, out var existing))
+            return existing;
+        
+        if (type.IsPrimitive || type.IsEnum)
+            throw new InvalidOperationException($"Cannot resolve primitive or enum type: {type}");
+        
+        if (!_typesToImplementation.TryGetValue(type, out var binding))
+            throw new InvalidOperationException($"Type {type} is not registered in the container.");
+        
         if (binding.Scope == Scope.Singleton && _typesToObjects.TryGetValue(type, out var result))
             return result;
         
         var implementationType = binding.ImplementationType;
         var constructor = implementationType.GetConstructors().First();
-        var args = new List<object>();
-        
-        foreach (var parameter in constructor.GetParameters())
-        {
-            args.Add(Resolve(parameter.ParameterType));
-        }
 
-        var instance = constructor.Invoke(args.ToArray());
+        var instance = constructor.Invoke(constructor.GetParameters()
+            .Select(parameter => Resolve(parameter.ParameterType)).ToArray());
 
         _typesToObjects[type] = instance;
         return instance;
-
     }
 
     public T Resolve<T>()

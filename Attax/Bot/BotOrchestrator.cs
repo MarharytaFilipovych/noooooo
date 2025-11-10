@@ -3,7 +3,7 @@ using Model.PlayerType;
 
 namespace Bot;
 
-public class BotOrchestrator(IBotStrategy strategy, int thinkingDelayMs = 500)
+public class BotOrchestrator(IBotStrategy strategy, int thinkingDelayMs = 500) : IBotOrchestrator
 {
     private readonly IBotStrategy _strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
 

@@ -1,11 +1,11 @@
-using Model.Board;
 using Model.PlayerType;
+using Move.Validator;
 
 namespace Model.Game;
 
 public class GameEndDetector 
 {
-    public GameEndResult CheckGameEnd(Board.Board board, MoveValidator validator, PlayerType.PlayerType currentPlayer)
+    public GameEndResult CheckGameEnd(Board.Board board, IMoveValidator validator, PlayerType.PlayerType currentPlayer)
     {
         var (xCount, oCount) = board.CountPieces();
 
@@ -25,8 +25,8 @@ public class GameEndDetector
         }
 
         var opponent = currentPlayer.GetOpponent();
-        var currentCanMove = validator.GetValidMoves(currentPlayer).Count > 0;
-        var opponentCanMove = validator.GetValidMoves(opponent).Count > 0;
+        var currentCanMove = validator.GetValidMoves(board, currentPlayer).Count > 0;
+        var opponentCanMove = validator.GetValidMoves(board, opponent).Count > 0;
 
         if (!currentCanMove && !opponentCanMove)
         {

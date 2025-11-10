@@ -1,12 +1,12 @@
-namespace Model;
+namespace Move;
 
 public class Move
 {
-    public Position.Position From { get; }
-    public Position.Position To { get; }
+    public Model.Position.Position From { get; }
+    public Model.Position.Position To { get; }
     public MoveType Type { get; }
 
-    public Move(Position.Position from, Position.Position to)
+    public Move(Model.Position.Position from, Model.Position.Position to)
     {
         From = from;
         To = to;

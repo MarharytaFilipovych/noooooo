@@ -6,7 +6,7 @@ public record GameState(
     PlayerType.PlayerType CurrentPlayer,
     int XCount,
     int OCount,
-    bool IsEnded,
+    bool isEnded,
     PlayerType.PlayerType Winner,
     string LayoutName
 );

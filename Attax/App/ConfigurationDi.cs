@@ -5,8 +5,15 @@ using Commands.CommandExecutor;
 using ConsoleOutput;
 using Core;
 using Model;
+using Model.Board.Layouts;
 using Model.Game.Game;
+using Model.Game.TurnTimer;
+using Move.Executor;
+using Move.Generator;
+using Move.Validator;
 using Presenter;
+using Stats.Repository;
+using Stats.Tracker;
 using View;
 using View.ViewFactory;
 using ViewSwitcher;
@@ -21,30 +28,54 @@ public static class Configuration
 
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
-        container.Register<IBotStrategy, RandomBotStrategy>(Scope.Singleton);
-        container.Register<IGamePresenter, GamePresenter>(Scope.Singleton);
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
+        container.Register<IBotStrategy, RandomBotStrategy>(Scope.Singleton);
+
+        container.Register<IMoveExecutor, MoveExecutor>(Scope.Singleton);
+        container.Register<IMoveValidator, MoveValidator>(Scope.Singleton);
+        container.Register<IMoveGenerator, RandomMoveGenerator>(Scope.Singleton);
+        container.Register<ITurnTimer, TurnTimer>(Scope.Singleton);
+        container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
+        container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
+        container.Register<IBoardLayout, ClassicLayout>(Scope.Singleton);
+
+        var statsTracker = container.Resolve<IStatsTracker>();
+        var turnTimer = container.Resolve<ITurnTimer>();
+        var moveValidator = container.Resolve<IMoveValidator>();
+        var moveExecutor = container.Resolve<IMoveExecutor>();
+        var moveGenerator = container.Resolve<IMoveGenerator>();
+        var boardLayout = container.Resolve<IBoardLayout>();
+
+        var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator,
+            moveExecutor, moveGenerator, boardLayout);
+
+        container.RegisterInstance(game);
+
+        container.Register<CommandProcessor, CommandProcessor>(Scope.Singleton);
+        container.Register<BotOrchestrator, BotOrchestrator>(Scope.Singleton);
+        container.Register<GamePresenter, GamePresenter>(Scope.Singleton);
+
         return container;
     }
 
     public static void ConfigureViews(DiContainer container)
     {
         var factory = container.Resolve<IViewFactory>();
-
         factory.RegisterView(ViewType.Simple, () => new SimpleView());
         factory.RegisterView(ViewType.Enhanced, () => new EnhancedView());
     }
 
     public static void ConfigureCommands(DiContainer container)
     {
-        var game = new AtaxxGameWithEvents();
-        var context = new CommandProcessor();
+        var game = container.Resolve<AtaxxGameWithEvents>();
+        var commandProcessor = container.Resolve<CommandProcessor>();
         var viewSwitcher = container.Resolve<IViewSwitcher>();
 
-        context.Register(new MoveCommandDefinition(), new MoveCommandExecutor(game));
-        context.Register(new SwitchViewCommandDefinition(), new SwitchViewCommandExecutor(viewSwitcher));
-        context.Register(new QuitCommandDefinition(), new QuitCommandExecutor());
-        context.Register(new HintCommandDefinition(), new HintCommandExecutor(game));
-        context.Register(new HelpCommandDefinition(), new HelpCommandExecutor(context.Commands.ToList()));
+        commandProcessor.Register(new MoveCommandDefinition(), new MoveCommandExecutor(game));
+        commandProcessor.Register(new SwitchViewCommandDefinition(), new SwitchViewCommandExecutor(viewSwitcher));
+        commandProcessor.Register(new QuitCommandDefinition(), new QuitCommandExecutor());
+        commandProcessor.Register(new HintCommandDefinition(), new HintCommandExecutor(game));
+        commandProcessor.Register(new HelpCommandDefinition(), new HelpCommandExecutor(commandProcessor.Commands().ToList()));
+        commandProcessor.Register(new StatsCommandDefinition(), new StatsCommandExecutor(game));
     }
 }

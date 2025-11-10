@@ -10,12 +10,9 @@
     <ItemGroup>
       <ProjectReference Include="..\Board\Board.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\Move\Move.csproj" />
       <ProjectReference Include="..\Stats\Stats.csproj" />
       <ProjectReference Include="..\TurnTimer\TurnTimer.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="TurnTimer\" />
     </ItemGroup>
 
 </Project>

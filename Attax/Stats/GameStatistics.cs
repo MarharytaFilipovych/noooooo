@@ -3,7 +3,7 @@
 namespace Stats;
 
 public sealed record GameStatistics(int GamesPlayed, int PlayerXWins,
-    int PlayerOWins, int Draws, double AverageMoveCount, DateTime LastPlayed )
+    int PlayerOWins, int Draws, double AverageMoveCount, DateTime LastPlayed)
 {
     public static GameStatistics Empty => 
         new(0, 0, 0, 0, 

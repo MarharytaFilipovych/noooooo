@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Commands\Commands.csproj" />
-      <ProjectReference Include="..\ViewSwitcher\ViewSwitcher.csproj" />
+      <ProjectReference Include="..\Board\Board.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="CareTaker\" />
     </ItemGroup>
 
 </Project>

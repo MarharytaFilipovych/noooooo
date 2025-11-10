@@ -114,13 +114,13 @@ public class EnhancedView : IGameView
         Console.WriteLine($"\n> {playerLabel}'s turn");
     }
 
-    public void DisplayMove(Move move, PlayerType player, bool isBot)
+    public void DisplayMove(Move.Move move, PlayerType player, bool isBot)
     {
         var playerLabel = isBot ? $"Bot ({player})" : $"Player {player}";
         Console.WriteLine($" {playerLabel} moved: {move}");
     }
 
-    public void DisplayInvalidMove(Move move) => Console.WriteLine($" Invalid move: {move}");
+    public void DisplayInvalidMove(Move.Move move) => Console.WriteLine($" Invalid move: {move}");
 
     public void DisplayGameEnd(GameState state, PlayerType winner)
     {
@@ -135,7 +135,7 @@ public class EnhancedView : IGameView
         Console.WriteLine("════════════════════════════════");
     }
     
-    public void DisplayHint(List<Move> validMoves)
+    public void DisplayHint(List<Move.Move> validMoves)
     {
         Console.WriteLine("╔══════════════════════════════╗");
         Console.WriteLine("║       Valid Moves            ║");
@@ -151,14 +151,6 @@ public class EnhancedView : IGameView
         Console.Write("❤️ ");
         return Console.ReadLine() ?? string.Empty;
     }
-
-
-    public string DisplayMessageForAnswer(string message)
-    {
-        Console.Write($"❤️❤️❤️❤️❤️❤️ {message}");
-        return Console.ReadLine() ?? string.Empty;
-    } 
-        
     
     public void DisplayError(string error)
     {
@@ -204,5 +196,23 @@ public class EnhancedView : IGameView
         Console.WriteLine("║  A random move has been applied automatically. ║");
         Console.WriteLine("╚════════════════════════════════════════════╝");
     }
+    
+    public void DisplayUndo(bool success, PlayerType player)
+    {
+        Console.WriteLine("\n╔════════════════════════════════════════╗");
+        if (success)
+        {
+            Console.WriteLine($"║ ✅ Undo Successful! Player {player}       ║");
+            Console.WriteLine("║    last move has been reverted.         ║");
+        }
+        else
+        {
+            Console.WriteLine($"║ ❌ Undo Failed! Player {player}         ║");
+            Console.WriteLine("║    No move to revert.                   ║");
+        }
+
+        Console.WriteLine("╚════════════════════════════════════════╝\n");
+    }
+
 }
 
