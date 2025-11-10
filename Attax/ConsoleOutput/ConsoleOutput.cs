@@ -2,6 +2,7 @@
 using Model.Game.Game;
 using Model.Game.Mode;
 using Model.PlayerType;
+using Stats;
 using View;
 using ViewSwitcher;
 
@@ -22,14 +23,20 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         game.BoardUpdated += OnBoardUpdated;
         game.HintRequested += OnHintRequested;
         game.ModeSet += OnModeSet;
+        game.StatsRequested += OnStatsRequested;
+        game.TurnTimedOut += OnTurnTimeOut;
+        game.MoveUndone += OnMoveUndo;
         viewSwitcher.ViewSelected += OnViewSelected;
     }
 
-    private void OnHintRequested(List<Move> moves) => 
-        viewSwitcher.CurrentView.DisplayHint(moves);
+    private void OnMoveUndo(bool success, PlayerType playerType) =>
+        View.DisplayUndo(success, playerType);
+    
+    private void OnHintRequested(List<Move.Move> moves) => View.DisplayHint(moves);
 
     private void OnModeSet(GameMode gameMode) =>
-        View.DisplayMessage(gameMode == GameMode.PvE ? "You are Player X, Bot is Player O" : "ENJOY!");
+        View.DisplayMessage(gameMode == GameMode.PvE 
+            ? "You are Player X, Bot is Player O" : "ENJOY!");
     
     private void OnGameStarted(Cell[,] board, string layoutName) =>
         View.DisplayGameStart(game.GetGameState(), layoutName, game.GameMode.Mode);
@@ -42,23 +49,25 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         View.DisplayTurn(player, isBot);
     }
 
-    private void OnMoveMade(Move move, PlayerType player)
+    private void OnMoveMade(Move.Move move, PlayerType player)
     {
         var isBot = game.GameMode.IsBot(player);
         View.DisplayMove(move, player, isBot);
     }
 
-    private void OnMoveInvalid(Move move, PlayerType player) => View.DisplayInvalidMove(move);
+    private void OnMoveInvalid(Move.Move move, PlayerType player) => View.DisplayInvalidMove(move);
 
-    private void OnPlayerWon(PlayerType winner) =>
-        View.DisplayGameEnd(game.GetGameState(), winner);
+    private void OnPlayerWon(PlayerType winner) => View.DisplayGameEnd(game.GetGameState(), winner);
 
-    private void OnGameDrawn() =>
-        View.DisplayGameEnd( game.GetGameState(), PlayerType.None);
+    private void OnGameDrawn() => View.DisplayGameEnd( game.GetGameState(), PlayerType.None);
 
     private void OnViewSelected()
     {
         View.UpdateBoard(game.GetGameState());
         View.DisplayMessage($"Switched to {viewSwitcher.CurrentViewType} view");
     }
+
+    private void OnStatsRequested(GameStatistics statistics) => View.DisplayStatistics(statistics);
+
+    private void OnTurnTimeOut(PlayerType playerType) => View.DisplayElapsedTimeOutMessage(playerType);
 }

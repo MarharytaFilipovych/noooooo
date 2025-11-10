@@ -1,4 +1,3 @@
-using Model;
 using Model.Game.Game;
 using Model.PlayerType;
 
@@ -10,7 +9,7 @@ public class RandomBotStrategy(Random? random = null) : IBotStrategy
 
     public string Name => "Random Bot";
 
-    public Move SelectMove(List<Move> validMoves, AtaxxGame game, PlayerType botPlayer)
+    public Move.Move SelectMove(List<Move.Move> validMoves, AtaxxGame game, PlayerType botPlayer)
     {
         return validMoves.Count == 0 
             ? throw new InvalidOperationException("No valid moves available")

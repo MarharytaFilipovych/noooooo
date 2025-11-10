@@ -17,7 +17,7 @@ public class ViewSwitcher : IViewSwitcher
         _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
 
         if ( _viewFactory.GetAvailableViews().Count == 0) 
-            throw new InvalidOperationException("No views registered");
+            throw new InvalidOperationException("No views registered!");
         
         CurrentView = _viewFactory.CreateView(CurrentViewType);
     }

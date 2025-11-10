@@ -4,7 +4,7 @@ using Commands.CommandExecutor;
 
 namespace Commands;
 
-public class CommandProcessor
+public class CommandProcessor : ICommandProcessor
 {
     private readonly Dictionary<string, ICommandDefinition> _commandDefinitions =
         new(StringComparer.OrdinalIgnoreCase);
@@ -29,7 +29,7 @@ public class CommandProcessor
         _executors[typeof(TCommand)] = new TypedExecutor<TCommand>(executor);
     }
 
-    public IReadOnlyList<ICommandDefinition> Commands => _commandDefinitions.Values.ToList();
+    public IReadOnlyList<ICommandDefinition> Commands() => _commandDefinitions.Values.ToList();
 
     public ExecuteResult ProcessCommand(string[] args, out string? error)
     {
@@ -48,7 +48,7 @@ public class CommandProcessor
         return executor.Execute(command);
     }
 
-    private bool TryValidateInput(string[] args, out string? error)
+    private static bool TryValidateInput(string[] args, out string? error)
     {
         if (args.Length == 0)
         {
@@ -72,7 +72,7 @@ public class CommandProcessor
         return true;
     }
 
-    private bool TryParseCommand(ICommandDefinition definition, string[] args, out ICommand? command, out string? error)
+    private static bool TryParseCommand(ICommandDefinition definition, string[] args, out ICommand? command, out string? error)
     {
         return definition.TryParse(args, out command, out error);
     }
@@ -81,7 +81,7 @@ public class CommandProcessor
     {
         if (!_executors.TryGetValue(commandType, out executor!))
         {
-            error = $"No executor registered for command: {commandType.Name}";
+            error = $"No executor registered for command: {commandType.Name}!!!";
             return false;
         }
 

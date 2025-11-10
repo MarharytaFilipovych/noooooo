@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Model.Game</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Board\Board.csproj" />
+      <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\Move\Move.csproj" />
+      <ProjectReference Include="..\Stats\Stats.csproj" />
+      <ProjectReference Include="..\TurnTimer\TurnTimer.csproj" />
+    </ItemGroup>
+
+</Project>
