@@ -6,6 +6,7 @@ using ConsoleOutput;
 using Core;
 using Model;
 using Model.Board.Layouts;
+using Model.Game.EndDetector;
 using Model.Game.Game;
 using Model.Game.TurnTimer;
 using Move.Executor;
@@ -34,6 +35,7 @@ public static class Configuration
         container.Register<IMoveExecutor, MoveExecutor>(Scope.Singleton);
         container.Register<IMoveValidator, MoveValidator>(Scope.Singleton);
         container.Register<IMoveGenerator, RandomMoveGenerator>(Scope.Singleton);
+        container.Register<IGameEndDetector, GameEndDetector>(Scope.Singleton);
         container.Register<ITurnTimer, TurnTimer>(Scope.Singleton);
         container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
         container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
@@ -45,15 +47,18 @@ public static class Configuration
         var moveExecutor = container.Resolve<IMoveExecutor>();
         var moveGenerator = container.Resolve<IMoveGenerator>();
         var boardLayout = container.Resolve<IBoardLayout>();
+        var endDetector = container.Resolve<IGameEndDetector>();
 
         var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator,
-            moveExecutor, moveGenerator, boardLayout);
+            moveExecutor, moveGenerator, endDetector, boardLayout);
 
         container.RegisterInstance(game);
+        
+        //container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
 
-        container.Register<CommandProcessor, CommandProcessor>(Scope.Singleton);
-        container.Register<BotOrchestrator, BotOrchestrator>(Scope.Singleton);
-        container.Register<GamePresenter, GamePresenter>(Scope.Singleton);
+        container.Register<ICommandProcessor, CommandProcessor>(Scope.Singleton);
+        container.Register<IBotOrchestrator, BotOrchestrator>(Scope.Singleton);
+        container.Register<IGamePresenter, GamePresenter>(Scope.Singleton);
 
         return container;
     }

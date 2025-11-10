@@ -1,6 +1,7 @@
 using Model.Board.Layouts;
 using Model.Game.CareTaker;
 using Model.Game.DTOs;
+using Model.Game.EndDetector;
 using Model.Game.Mode;
 using Model.Game.TurnTimer;
 using Model.PlayerType;
@@ -24,7 +25,7 @@ public class AtaxxGame
     private readonly IMoveValidator _moveValidator;
     private readonly IMoveExecutor _moveExecutor;
     private readonly IMoveGenerator _moveGenerator;
-    private readonly GameEndDetector _endDetector;
+    private readonly IGameEndDetector _endDetector;
     private readonly IStatsTracker _statsTracker;
     private readonly GameProgress _progress;
     
@@ -39,7 +40,7 @@ public class AtaxxGame
     public string LayoutName => _layout.Name;
 
     public AtaxxGame(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator, 
-        IMoveExecutor executor, IMoveGenerator generator, int boardSize = DefaultBoardSize, IBoardLayout? layout = null)
+        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector, int boardSize = DefaultBoardSize, IBoardLayout? layout = null)
     {
         _statsTracker = statsTracker;
         _turnTimer = turnTimer;
@@ -49,15 +50,14 @@ public class AtaxxGame
         _board = new Board.Board(boardSize);
         _layout = layout ?? BoardLayoutFactory.GetRandomLayout();
         _careTaker = new CareTaker.CareTaker(this);
-        _endDetector = new GameEndDetector();
+        _endDetector = endDetector;
         _progress = new GameProgress();
-        
         _turnTimer.TimeoutOccurred += HandleTimeout;
     }
     
 
     private AtaxxGame(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator, 
-        IMoveExecutor executor, IMoveGenerator generator, Board.Board clonedBoard, IBoardLayout layout)
+        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector, Board.Board clonedBoard, IBoardLayout layout)
     {
         _statsTracker = statsTracker;
         _turnTimer = turnTimer;
@@ -67,9 +67,8 @@ public class AtaxxGame
         _board = clonedBoard;
         _layout = layout;
         _careTaker = new CareTaker.CareTaker(this);
-        _endDetector = new GameEndDetector();
+        _endDetector = endDetector;
         _progress = new GameProgress();
-        
         _turnTimer.TimeoutOccurred += HandleTimeout;
     }
     

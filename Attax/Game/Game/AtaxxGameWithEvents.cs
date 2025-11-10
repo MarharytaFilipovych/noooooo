@@ -1,4 +1,5 @@
 using Model.Board.Layouts;
+using Model.Game.EndDetector;
 using Model.Game.Mode;
 using Model.Game.TurnTimer;
 using Model.Position;
@@ -26,14 +27,14 @@ public class AtaxxGameWithEvents : AtaxxGame
     public event Action<bool, PlayerType.PlayerType>? MoveUndone;
 
     public AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator,
-        IMoveExecutor executor, IMoveGenerator generator, int boardSize = DefaultBoardSize)
-        : base(statsTracker, turnTimer, validator, executor, generator, boardSize) { }
+        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector, int boardSize = DefaultBoardSize)
+        : base(statsTracker, turnTimer, validator, executor, generator, endDetector, boardSize) { }
     
     
     public AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
-        IMoveValidator validator, IMoveExecutor executor, IMoveGenerator generator,
+        IMoveValidator validator, IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector,
          IBoardLayout layout, int boardSize = DefaultBoardSize)
-        : base(statsTracker, turnTimer, validator, executor, generator, boardSize, layout) { }
+        : base(statsTracker, turnTimer, validator, executor, generator, endDetector, boardSize, layout) { }
     
    
     protected override void HandleTimeout()

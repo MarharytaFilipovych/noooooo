@@ -1,9 +1,9 @@
 using Model.PlayerType;
 using Move.Validator;
 
-namespace Model.Game;
+namespace Model.Game.EndDetector;
 
-public class GameEndDetector 
+public class GameEndDetector : IGameEndDetector
 {
     public GameEndResult CheckGameEnd(Board.Board board, IMoveValidator validator, PlayerType.PlayerType currentPlayer)
     {
