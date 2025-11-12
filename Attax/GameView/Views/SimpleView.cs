@@ -1,11 +1,9 @@
+using Model.Game.DTOs;
 using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
-namespace View;
-
-using Model.Game.DTOs;
-using System;
+namespace View.Views;
 
 public class SimpleView : IGameView
 {
@@ -115,14 +113,14 @@ public class SimpleView : IGameView
         Console.WriteLine("╚══════════════════════════════════════╝");
     }
 
-    public string GetInput() 
+    public string DisplayGetInput() 
     {
         Console.Write("> ");
         return Console.ReadLine() ?? string.Empty;
     }
     
     public void DisplayElapsedTimeOutMessage(PlayerType playerType) =>
-        Console.WriteLine($"Time's up for {playerType.ToString()}!" +
+        Console.WriteLine($"Time's up for {playerType}!" +
                           $" A random move has been made automatically.");
     
     public void DisplayUndo(bool success, PlayerType player)

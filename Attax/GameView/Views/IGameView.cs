@@ -1,10 +1,9 @@
+using Model.Game.DTOs;
 using Model.Game.Mode;
 using Model.PlayerType;
-using Model;
-using Model.Game.DTOs;
 using Stats;
 
-namespace View;
+namespace View.Views;
 
 public interface IGameView
 {
@@ -17,7 +16,7 @@ public interface IGameView
     void DisplayGameEnd(GameState state, PlayerType winner);
     void DisplayHint(List<Move.Move> validMoves);
     void DisplayMessage(string message);
-    string GetInput();
+    string DisplayGetInput();
     void DisplayError(string error);
     string DisplayModeSelection();
     void DisplayStatistics(GameStatistics statistics);

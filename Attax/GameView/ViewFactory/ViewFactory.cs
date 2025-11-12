@@ -1,4 +1,5 @@
 using Model;
+using View.Views;
 
 namespace View.ViewFactory;
 
@@ -15,3 +16,10 @@ public class ViewFactory : IViewFactory
 
     public IReadOnlyList<ViewType> GetAvailableViews() => _viewCreators.Keys.ToList();
 }
+
+/* private static readonly IBoardLayout[] Layouts =
+    [
+        new ClassicLayout(),
+        new CrossLayout(),
+        new CenterBlockLayout()
+    ];*/

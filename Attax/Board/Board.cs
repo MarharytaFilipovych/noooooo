@@ -1,4 +1,4 @@
-using Model.Board.Layouts;
+using Layout;
 
 namespace Model.Board;
 
