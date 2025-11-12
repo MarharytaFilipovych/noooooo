@@ -4,6 +4,7 @@ using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 using View;
+using View.Views;
 using ViewSwitcher;
 
 namespace ConsoleOutput;

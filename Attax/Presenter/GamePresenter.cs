@@ -2,10 +2,12 @@ using Bot;
 using Commands;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
+using Commands.CommandProcessor;
 using Model.Game.Game;
 using Model.Game.Mode;
 using Model.PlayerType;
 using View;
+using View.Views;
 using ViewSwitcher;
 
 namespace Presenter;
@@ -30,7 +32,7 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
             if (IsCurrentPlayerBot()) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
             else
             {
-                var input = View.GetInput();
+                var input = View.DisplayGetInput();
                 if (string.IsNullOrWhiteSpace(input)) continue;
                 var result = commandProcessor.ProcessCommand(ParseInput(input), out var error);
                 if (result == ExecuteResult.Break)break;

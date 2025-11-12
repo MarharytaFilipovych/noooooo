@@ -1,11 +1,11 @@
 using Bot;
-using Commands;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
+using Commands.CommandProcessor;
 using ConsoleOutput;
 using Core;
+using Layout;
 using Model;
-using Model.Board.Layouts;
 using Model.Game.EndDetector;
 using Model.Game.Game;
 using Model.Game.TurnTimer;
@@ -15,8 +15,8 @@ using Move.Validator;
 using Presenter;
 using Stats.Repository;
 using Stats.Tracker;
-using View;
 using View.ViewFactory;
+using View.Views;
 using ViewSwitcher;
 
 namespace App;
@@ -27,6 +27,8 @@ public static class Configuration
     {
         var container = new DiContainer();
 
+        ConfigureLayouts();
+        
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
@@ -41,7 +43,7 @@ public static class Configuration
         container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
         container.Register<IBoardLayout, ClassicLayout>(Scope.Singleton);
 
-        var statsTracker = container.Resolve<IStatsTracker>();
+        /*var statsTracker = container.Resolve<IStatsTracker>();
         var turnTimer = container.Resolve<ITurnTimer>();
         var moveValidator = container.Resolve<IMoveValidator>();
         var moveExecutor = container.Resolve<IMoveExecutor>();
@@ -52,15 +54,22 @@ public static class Configuration
         var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator,
             moveExecutor, moveGenerator, endDetector, boardLayout);
 
-        container.RegisterInstance(game);
+        container.RegisterInstance(game);*/
         
-        //container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
+        container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
 
         container.Register<ICommandProcessor, CommandProcessor>(Scope.Singleton);
         container.Register<IBotOrchestrator, BotOrchestrator>(Scope.Singleton);
         container.Register<IGamePresenter, GamePresenter>(Scope.Singleton);
 
         return container;
+    }
+
+    private static void ConfigureLayouts()
+    {
+        BoardLayoutFactory.RegisterLayout(new ClassicLayout());
+        BoardLayoutFactory.RegisterLayout(new CrossLayout());
+        BoardLayoutFactory.RegisterLayout(new CenterBlockLayout());
     }
 
     public static void ConfigureViews(DiContainer container)

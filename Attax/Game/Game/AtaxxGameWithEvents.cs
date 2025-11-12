@@ -1,4 +1,4 @@
-using Model.Board.Layouts;
+using Layout;
 using Model.Game.EndDetector;
 using Model.Game.Mode;
 using Model.Game.TurnTimer;

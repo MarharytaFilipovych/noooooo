@@ -1,9 +1,12 @@
-﻿using Bot;
+﻿using App;
+using Bot;
 using Commands;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
+using Commands.CommandProcessor;
+using ConsoleOutput;
+using Layout;
 using Model;
-using Model.Board.Layouts;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Game;
@@ -16,17 +19,20 @@ using Stats.Repository;
 using Stats.Tracker;
 using View;
 using View.ViewFactory;
+using View.Views;
 
 
-//var container = Configuration.ConfigureContainer();
-//Configuration.ConfigureViews(container);
-//Configuration.ConfigureCommands(container);
+/*var container = Configuration.ConfigureContainer();
+Configuration.ConfigureViews(container);
+Configuration.ConfigureCommands(container);
 
-//var presenter = container.Resolve<IGamePresenter>();
-//var consoleOutput = container.Resolve<IConsoleOutput>();
+var presenter = container.Resolve<IGamePresenter>();
+var consoleOutput = container.Resolve<IConsoleOutput>();*/
 
-
-var boardLayout = new ClassicLayout();
+BoardLayoutFactory.RegisterLayout(new ClassicLayout());
+BoardLayoutFactory.RegisterLayout(new CrossLayout());
+BoardLayoutFactory.RegisterLayout(new CenterBlockLayout());
+var boardLayout = BoardLayoutFactory.GetLayout(LayoutType.Classic);
 var statsTracker = new StatsTracker(new JsonStatisticsRepository());
 var moveExecutor = new MoveExecutor();
 var moveValidator = new MoveValidator();
@@ -37,7 +43,6 @@ var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator, moveE
 var viewFactory = new ViewFactory();
 viewFactory.RegisterView(ViewType.Simple, () => new SimpleView());
 viewFactory.RegisterView(ViewType.Enhanced, () => new EnhancedView());
-
 var viewSwitcher = new ViewSwitcher.ViewSwitcher(viewFactory);
 
 var commandProcessor = new CommandProcessor();

@@ -1,4 +1,4 @@
-using Model.Board.Layouts;
+using Layout;
 using Model.Game.CareTaker;
 using Model.Game.DTOs;
 using Model.Game.EndDetector;

@@ -2,7 +2,7 @@ using Command;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
 
-namespace Commands;
+namespace Commands.CommandProcessor;
 
 public interface ICommandProcessor
 {

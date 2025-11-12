@@ -1,12 +1,9 @@
+using Model.Game.DTOs;
 using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
-namespace View;
-
-using Model;
-using Model.Game.DTOs;
-using System;
+namespace View.Views;
 
 public class EnhancedView : IGameView
 {
@@ -102,7 +99,7 @@ public class EnhancedView : IGameView
         Console.Clear();
         Console.WriteLine("════════════════════════════════");
         Console.WriteLine("    Game started");
-        Console.WriteLine($"    Layout: {layoutName}");
+        Console.WriteLine($"    LayoutType: {layoutName}");
         Console.WriteLine($"    Mode: {mode}");
         Console.WriteLine("════════════════════════════════");
         UpdateBoard(state);
@@ -146,7 +143,7 @@ public class EnhancedView : IGameView
     public void DisplayMessage(string message) => 
         Console.WriteLine($"❤️❤️❤️❤️❤️❤️ {message}");
     
-    public string GetInput()
+    public string DisplayGetInput()
     {
         Console.Write("❤️ ");
         return Console.ReadLine() ?? string.Empty;
