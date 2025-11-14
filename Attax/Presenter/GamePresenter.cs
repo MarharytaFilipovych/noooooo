@@ -60,6 +60,12 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
         
         game.SetMode();
     }
+
+    private void SetSize()
+    {
+        var input = View.DisplayGetInput();
+        
+    }
         
     private GameModeConfiguration CreatePvEWithUndo()
     {

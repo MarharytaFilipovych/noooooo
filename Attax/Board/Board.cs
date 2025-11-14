@@ -6,25 +6,32 @@ using System;
 
 public class Board
 {
+    private const int DefaultSize = 8;
+    private const int MinBoardSize = 5;
+    private const int MaxBoardSize = 5;
+
     private readonly Cell[,] _cells;
 
     public int Size { get; }
 
-    public Board(int size)
+    public Board(int? size = null)
     {
-        if (size < 5) throw new ArgumentException("Board size must be at least 5");
+        var boardSize = size ?? DefaultSize;
+        if (boardSize is < MinBoardSize or > MaxBoardSize) 
+            throw new ArgumentException("Board size must be at least 5");
 
-        Size = size;
-        _cells = new Cell[size, size];
-        
-        for (var row = 0; row < size; row++)
+        Size = boardSize;
+        _cells = new Cell[Size, Size];
+
+        for (var row = 0; row < Size; row++)
         {
-            for (var col = 0; col < size; col++)
+            for (var col = 0; col < Size; col++)
             {
                 _cells[row, col] = new Cell();
             }
         }
     }
+
 
     public void Initialize(IBoardLayout layout)
     {

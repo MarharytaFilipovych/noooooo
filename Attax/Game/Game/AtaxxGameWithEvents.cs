@@ -11,7 +11,10 @@ using Move.Validator;
 
 namespace Model.Game.Game;
 
-public class AtaxxGameWithEvents : AtaxxGame
+public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
+    IMoveValidator validator, IMoveExecutor executor,
+    IMoveGenerator generator, IGameEndDetector endDetector, IBoardLayout? boardLayout = null)
+    : AtaxxGame(statsTracker, turnTimer, validator, executor, generator, endDetector, boardLayout)
 {
     public event Action<Cell[,], string>? GameStarted;
     public event Action<PlayerType.PlayerType>? PlayerWon;
@@ -26,26 +29,16 @@ public class AtaxxGameWithEvents : AtaxxGame
     public event Action<PlayerType.PlayerType>? TurnTimedOut;
     public event Action<bool, PlayerType.PlayerType>? MoveUndone;
 
-    public AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator,
-        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector, int boardSize = DefaultBoardSize)
-        : base(statsTracker, turnTimer, validator, executor, generator, endDetector, boardSize) { }
-    
-    
-    public AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
-        IMoveValidator validator, IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector,
-         IBoardLayout layout, int boardSize = DefaultBoardSize)
-        : base(statsTracker, turnTimer, validator, executor, generator, endDetector, boardSize, layout) { }
-    
-   
+
     protected override void HandleTimeout()
     {
         if (!IsEnded) TurnTimedOut?.Invoke(CurrentPlayer);
         base.HandleTimeout();
     }
 
-    public override void StartGame()
+    public override void StartGame(int? boardSize = null)
     {
-        base.StartGame();
+        base.StartGame(boardSize);
         GameStarted?.Invoke(GetBoard(), LayoutName);
         TurnChanged?.Invoke(CurrentPlayer);
     }

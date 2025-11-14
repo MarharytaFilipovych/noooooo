@@ -32,14 +32,13 @@ var consoleOutput = container.Resolve<IConsoleOutput>();*/
 BoardLayoutFactory.RegisterLayout(new ClassicLayout());
 BoardLayoutFactory.RegisterLayout(new CrossLayout());
 BoardLayoutFactory.RegisterLayout(new CenterBlockLayout());
-var boardLayout = BoardLayoutFactory.GetLayout(LayoutType.Classic);
 var statsTracker = new StatsTracker(new JsonStatisticsRepository());
 var moveExecutor = new MoveExecutor();
 var moveValidator = new MoveValidator();
 var moveGenerator = new RandomMoveGenerator(moveValidator);
 var endDetector = new GameEndDetector();
 var turnTimer = new TurnTimer();
-var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator, moveExecutor, moveGenerator, endDetector, boardLayout);
+var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator, moveExecutor, moveGenerator, endDetector);
 var viewFactory = new ViewFactory();
 viewFactory.RegisterView(ViewType.Simple, () => new SimpleView());
 viewFactory.RegisterView(ViewType.Enhanced, () => new EnhancedView());

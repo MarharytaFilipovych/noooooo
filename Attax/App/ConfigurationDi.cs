@@ -28,7 +28,6 @@ public static class Configuration
         var container = new DiContainer();
 
         ConfigureLayouts();
-        
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
@@ -42,19 +41,6 @@ public static class Configuration
         container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
         container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
         container.Register<IBoardLayout, ClassicLayout>(Scope.Singleton);
-
-        /*var statsTracker = container.Resolve<IStatsTracker>();
-        var turnTimer = container.Resolve<ITurnTimer>();
-        var moveValidator = container.Resolve<IMoveValidator>();
-        var moveExecutor = container.Resolve<IMoveExecutor>();
-        var moveGenerator = container.Resolve<IMoveGenerator>();
-        var boardLayout = container.Resolve<IBoardLayout>();
-        var endDetector = container.Resolve<IGameEndDetector>();
-
-        var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator,
-            moveExecutor, moveGenerator, endDetector, boardLayout);
-
-        container.RegisterInstance(game);*/
         
         container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
 

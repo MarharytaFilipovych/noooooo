@@ -5,11 +5,6 @@ public class DiContainer : IDiContainer
     private readonly Dictionary<Type, Binding> _typesToImplementation = new();
     
     private readonly Dictionary<Type, object> _typesToObjects = new();
-    
-    public void RegisterInstance<T>(T instance)
-    {
-        _typesToObjects[typeof(T)] = instance!;
-    }
 
     public void Register<TInterface, TImplementation>(Scope scope) where TImplementation : TInterface
     {
