@@ -1,11 +1,11 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace Layout.LayoutType;
+namespace GameMode.ModeType;
 
-public static class LayoutTypeExtensions
+public static class GameModeTypeExtensions
 {
-    public static string GetDescription(this LayoutType value) 
+    public static string GetDescription(this GameModeType value)
     {
         var field = value.GetType().GetField(value.ToString());
         var attr = field?.GetCustomAttribute<DescriptionAttribute>();

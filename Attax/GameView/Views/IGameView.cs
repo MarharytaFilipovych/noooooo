@@ -8,7 +8,7 @@ public interface IGameView
 {
     void DisplayWelcome();
     void UpdateBoard(GameState state);
-    void DisplayGameStart(GameState state, string layoutName, GameMode.GameModeType modeType);
+    void DisplayGameStart(GameState state, string layoutName, string mode);
     void DisplayTurn(PlayerType player, bool isBot);
     void DisplayMove(Move.Move move, PlayerType player, bool isBot);
     void DisplayInvalidMove(Move.Move move);
@@ -22,4 +22,5 @@ public interface IGameView
     void DisplayUndo(bool success, PlayerType player);
     void DisplayHelp(List<(string Name, string Usage, string Description)> commands);
     void DisplayModeOptions(List<(string DisplayName, string Description)> options);
+    void DisplaySetModeResult(string modeName);
 }

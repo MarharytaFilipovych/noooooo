@@ -93,13 +93,13 @@ public class EnhancedView : IGameView
         Console.WriteLine("│");
     }
 
-    public void DisplayGameStart(GameState state, string layoutName, GameMode.GameModeType modeType)
+    public void DisplayGameStart(GameState state, string layoutName, string mode)
     {
         Console.Clear();
         Console.WriteLine("════════════════════════════════");
         Console.WriteLine("    Game started");
         Console.WriteLine($"    LayoutType: {layoutName}");
-        Console.WriteLine($"    ModeType: {modeType}");
+        Console.WriteLine($"    ModeType: {mode}");
         Console.WriteLine("════════════════════════════════");
         UpdateBoard(state);
     }
@@ -252,6 +252,13 @@ public class EnhancedView : IGameView
 
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("\n========================\n");
+        Console.ResetColor();
+    }
+    
+    public void DisplaySetModeResult(string modeName)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"🐷 Mode Selected: {modeName}.");
         Console.ResetColor();
     }
 

@@ -22,8 +22,10 @@ public class GamePresenter(
     public void Start()
     {
         View.DisplayWelcome();
+        gameSettings.Reset();
         SetMode();
         game.StartGame();
+        game.StartTimer();
         GameLoop();
     }
     
@@ -47,11 +49,15 @@ public class GamePresenter(
         
         switch (result)
         {
+            case ExecuteResult.Continue:
+                game.ResetTimer(); 
+                break;
             case ExecuteResult.Break:
                 Environment.Exit(0);
                 break;
             case ExecuteResult.Error:
                 View.DisplayError(error!);
+                game.ResetTimer();
                 break;
         }
     }
@@ -68,22 +74,16 @@ public class GamePresenter(
         if (modes.Count == 0)
             throw new InvalidOperationException("No game modes were registered!");
         
-        DisplayModeOptions(modes);
+        var optionsForView = modes
+            .Select(m => (m.DisplayName, m.Description))
+            .ToList();
+            
+        View.DisplayModeOptions(optionsForView);
         
         var selectedMode = GetModeSelection(modes);
         
         gameSettings.GameModeType = selectedMode.ModeType;
-        
         game.SetMode();
-    }
-
-    private void DisplayModeOptions(IReadOnlyList<GameModeOption> modes)
-    {
-        View.DisplayMessage("Select game mode:");
-        for (var i = 0; i < modes.Count; i++)
-        {
-            View.DisplayMessage($"{i + 1}. {modes[i].DisplayName} - {modes[i].Description}");
-        }
     }
 
     private GameModeOption GetModeSelection(IReadOnlyList<GameModeOption> modes)
@@ -93,7 +93,7 @@ public class GamePresenter(
         if (int.TryParse(input, out var choice) && choice > 0 && choice <= modes.Count)
             return modes[choice - 1];
         
-        View.DisplayMessage($"Invalid selection. Defaulting to {modes[0].DisplayName}");
+        View.DisplayError($"Invalid selection. Defaulting to {modes[0].DisplayName}");
         return modes[0];
     }
 }

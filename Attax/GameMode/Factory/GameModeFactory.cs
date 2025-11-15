@@ -1,4 +1,5 @@
 using GameMode.ModeConfigurations;
+using GameMode.ModeType;
 
 namespace GameMode.Factory;
 

@@ -41,11 +41,11 @@ public class SimpleView : IGameView
         Console.WriteLine($"\nScore - X: {state.XCount}, O: {state.OCount}");
     }
 
-    public void DisplayGameStart(GameState state, string layoutName, GameMode.GameModeType modeType)
+    public void DisplayGameStart(GameState state, string layoutName, string mode)
     {
         Console.Clear();
         Console.WriteLine($"Game started with layout: {layoutName}");
-        Console.WriteLine($"ModeType: {modeType}");
+        Console.WriteLine($"ModeType: {mode}");
         UpdateBoard(state);
     }
 
@@ -134,5 +134,8 @@ public class SimpleView : IGameView
             Console.WriteLine($"{i + 1}. {options[i].DisplayName} - {options[i].Description}");
         }
     }
+    
+    public void DisplaySetModeResult(string modeName) =>
+        DisplayMessage($"Game mode set to {modeName}.");
 }
 

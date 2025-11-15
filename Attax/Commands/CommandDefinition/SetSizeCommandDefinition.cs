@@ -1,5 +1,6 @@
 using Command;
 using GameMode;
+using GameMode.ModeType;
 using Model.Board;
 
 namespace Commands.CommandDefinition;

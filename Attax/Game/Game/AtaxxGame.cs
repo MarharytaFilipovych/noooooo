@@ -1,6 +1,7 @@
 using GameMode;
 using GameMode.Factory;
 using GameMode.ModeConfigurations;
+using GameMode.ModeType;
 using Layout.Factory;
 using Layout.Layout;
 using Model.Game.CareTaker;
@@ -46,13 +47,11 @@ public class AtaxxGame
     public PlayerType.PlayerType Winner => _progress.Winner;
     public bool IsEnded => _progress.IsEnded;
     protected int TurnNumber => _progress.TurnNumber;
+    protected string? LastValidationError; 
 
     protected string LayoutName => _layout?.Name
         ?? throw new InvalidOperationException("Cannot get layout before the game has started.");
-
-    protected int BoardSize => _board?.Size
-        ?? throw new InvalidOperationException("Cannot get board size before the game has started.");
-
+    
     public AtaxxGame(
         IStatsTracker statsTracker,
         ITurnTimer turnTimer,
@@ -101,30 +100,27 @@ public class AtaxxGame
 
         _board.Initialize(_layout);
         _progress.Initialize();
-        _turnTimer.StartTurn();
     }
+    
+    public void StartTimer() => _turnTimer.StartTurn();
+    public void ResetTimer() => _turnTimer.ResetTurn();
+
 
     public virtual bool MakeMove(Position.Position from, Position.Position to)
     {
         EnsureGameStarted();
-        
-        if (IsEnded)
-            throw new InvalidOperationException("Game has ended.");
+    
+        if (IsEnded) throw new InvalidOperationException("Game has ended.");
 
         var move = new Move.Move(from, to);
 
-        if (!_moveValidator.IsValidMove(_board, move, CurrentPlayer)) return false;
+        if (!_moveValidator.IsValidMove(_board, move, CurrentPlayer, out var validationError))
+        {
+            LastValidationError = validationError; 
+            return false;
+        }
 
-        if (_gameMode!.ModeType == GameModeType.PvE && !_gameMode.IsBot(CurrentPlayer))
-            _careTaker.BackUp();
-
-        ExecuteMove(move);
-
-        if (!IsEnded)
-            _turnTimer.ResetTurn();
-        else
-            _turnTimer.StopTurn();
-
+        LastValidationError = null; 
         return true;
     }
 

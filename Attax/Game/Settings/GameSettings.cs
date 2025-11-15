@@ -1,4 +1,5 @@
 using GameMode;
+using GameMode.ModeType;
 using Layout.LayoutType;
 using Model.Board;
 
