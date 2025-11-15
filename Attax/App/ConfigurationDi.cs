@@ -6,6 +6,7 @@ using ConsoleOutput;
 using Core;
 using Layout;
 using Layout.Factory;
+using Layout.Layout;
 using Model;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;

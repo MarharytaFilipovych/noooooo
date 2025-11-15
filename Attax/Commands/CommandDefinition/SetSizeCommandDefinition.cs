@@ -8,9 +8,9 @@ public class SetSizeCommandDefinition : ICommandDefinition
     private const int MinBoardSize = 5;
     private const int MaxBoardSize = 20;
 
-    public string Name => "set size";
+    public string Name => "size";
     public string Description => "Set game board size!";
-    public string Usage => "set size <number> (like \"set size 8\")";
+    public string Usage => "size <number> (like \"size 8\")";
     public bool TryParse(string[] args, out ICommand? command, out string? error)
     {
         command = null;

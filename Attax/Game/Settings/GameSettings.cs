@@ -1,3 +1,5 @@
+using Layout;
+using Layout.LayoutType;
 using Model.Board;
 
 namespace Model.Game.Settings;
@@ -5,6 +7,7 @@ namespace Model.Game.Settings;
 public class GameSettings : IGameSettings
 {
     private int _boardSize = BoardConstants.DefaultSize;
+    private LayoutType? _layoutType;
     private bool _isGameStarted;
     
     public int BoardSize
@@ -24,11 +27,26 @@ public class GameSettings : IGameSettings
         }
     }
 
+    public LayoutType? LayoutType
+    {
+        get => _layoutType;
+        set
+        {
+            if (_isGameStarted)
+                throw new InvalidOperationException("You can't change the layout after game has started!!!");
+            
+            _layoutType = value;
+        }
+    }
+
     public void MarkGameAsStarted() => _isGameStarted = true;
 
     public void Reset()
     {
         _isGameStarted = false;
         _boardSize = BoardConstants.DefaultSize;
+        _layoutType = null;
     }
 }
+
+

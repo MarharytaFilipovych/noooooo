@@ -1,4 +1,4 @@
-using Layout;
+using Layout.Factory;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Mode;
@@ -16,9 +16,10 @@ namespace Model.Game.Game;
 public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
     IMoveValidator validator, IMoveExecutor executor,
     IMoveGenerator generator, IGameEndDetector endDetector,
-    IGameSettings settings, ICareTakerFactory careTakerFactory, IBoardLayout? boardLayout = null)
+    IGameSettings settings, ICareTakerFactory careTakerFactory, 
+    IBoardLayoutFactory boardLayoutFactory)
     : AtaxxGame(statsTracker, turnTimer, validator, executor, 
-        generator, endDetector, settings, careTakerFactory, boardLayout)
+        generator, endDetector, settings, careTakerFactory, boardLayoutFactory)
 {
     public event Action<Cell[,], string>? GameStarted;
     public event Action<PlayerType.PlayerType>? PlayerWon;
@@ -70,25 +71,18 @@ public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTime
             MoveMade?.Invoke(move, previousPlayer);
             BoardUpdated?.Invoke(GetBoard());
             
-            if (!IsEnded) 
-                TurnChanged?.Invoke(CurrentPlayer);
-            else 
-                EndGame();
+            if (!IsEnded) TurnChanged?.Invoke(CurrentPlayer);
+            else EndGame();
         }
-        else 
-        {
-            MoveInvalid?.Invoke(move, previousPlayer);
-        }
+        else MoveInvalid?.Invoke(move, previousPlayer);
     }
 
     public void ShowHint() => HintRequested?.Invoke(GetValidMoves());
 
     public void EndGame()
     {
-        if (Winner == PlayerType.PlayerType.None) 
-            GameDrawn?.Invoke();
-        else 
-            PlayerWon?.Invoke(Winner);
+        if (Winner == PlayerType.PlayerType.None) GameDrawn?.Invoke();
+        else PlayerWon?.Invoke(Winner);
     }
 
     public void SetMode() => ModeSet?.Invoke(GameMode.Mode);

@@ -1,9 +1,9 @@
-namespace Layout;
+namespace Layout.Layout;
 
 public class CenterBlockLayout : IBoardLayout
 {
     public string Name => "Center Block";
-    public LayoutType Type => LayoutType.CenterBlock;
+    public LayoutType.LayoutType Type => LayoutType.LayoutType.CenterBlock;
 
     public bool IsBlocked(int row, int col, int boardSize)
     {

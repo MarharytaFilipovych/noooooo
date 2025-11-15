@@ -1,10 +1,12 @@
+using Layout.Layout;
+
 namespace Layout.Factory;
 
 public interface IBoardLayoutFactory
 {
     void RegisterLayout(IBoardLayout layout);
     IBoardLayout GetRandomLayout(Random? random = null);
-    IBoardLayout GetLayout(LayoutType type);
+    IBoardLayout GetLayout(LayoutType.LayoutType type);
     int GetLayoutCount();
-    IReadOnlyList<LayoutType> GetAvailableLayouts();
+    IReadOnlyList<LayoutType.LayoutType> GetAvailableLayouts();
 }
