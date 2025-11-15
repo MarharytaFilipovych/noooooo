@@ -1,16 +1,20 @@
 using Bot;
+using Bot.Orchestrator;
+using Bot.Strategy;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
 using Commands.CommandProcessor;
 using ConsoleOutput;
 using Core;
+using GameMode;
+using GameMode.Factory;
+using GameMode.ModeConfigurations;
 using Layout.Factory;
 using Layout.Layout;
 using Model;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Game;
-using Model.Game.Mode;
 using Model.Game.Settings;
 using Model.Game.TurnTimer;
 using Model.PlayerType;
@@ -18,8 +22,10 @@ using Move.Executor;
 using Move.Generator;
 using Move.Validator;
 using Presenter;
+using Stats;
 using Stats.Repository;
 using Stats.Tracker;
+using TurnTimer;
 using View.ViewFactory;
 using View.Views;
 using ViewSwitcher;
@@ -32,6 +38,10 @@ public static class Configuration
     {
         var container = new DiContainer();
 
+        container.Register<StatisticsOptions, StatisticsOptions>(Scope.Singleton);
+        container.Register<BotOptions, BotOptions>(Scope.Singleton);
+        container.Register<TurnTimerOptions, TurnTimerOptions>(Scope.Singleton);
+        
         container.Register<IGameSettings, GameSettings>(Scope.Singleton);
         container.Register<IBoardLayoutFactory, BoardLayoutFactory>(Scope.Singleton);
         container.Register<IGameModeFactory, GameModeFactory>(Scope.Singleton);
@@ -47,7 +57,7 @@ public static class Configuration
         container.Register<IMoveValidator, MoveValidator>(Scope.Singleton);
         container.Register<IMoveGenerator, RandomMoveGenerator>(Scope.Singleton);
         container.Register<IGameEndDetector, GameEndDetector>(Scope.Singleton);
-        container.Register<ITurnTimer, TurnTimer>(Scope.Singleton);
+        container.Register<ITurnTimer, Model.Game.TurnTimer.TurnTimer>(Scope.Singleton);
         container.Register<ICareTakerFactory, CareTakerFactory>(Scope.Singleton);
         
         container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
@@ -82,13 +92,13 @@ public static class Configuration
         var factory = container.Resolve<IGameModeFactory>();
         
         factory.RegisterMode(
-            new GameModeOption(GameMode.PvP, "Player vs Player", "Two human players compete"),
-            GameModeConfiguration.CreatePvP
+            new GameModeOption(GameModeType.PvP, "Player vs Player", "Two human players compete"),
+            new PvPConfiguration()
         );
 
         factory.RegisterMode(
-            new GameModeOption(GameMode.PvE, "Player vs Bot", "Play against AI opponent"),
-            () => GameModeConfiguration.CreatePvE(PlayerType.X)
+            new GameModeOption(GameModeType.PvE, "Player vs Bot", "Play against AI opponent"),
+            new PvEConfiguration(PlayerType.X) 
         );
     }
 
@@ -117,7 +127,7 @@ public static class Configuration
         
         commandProcessor.Register(
             new HelpCommandDefinition(), 
-            new HelpCommandExecutor(game, commandProcessor.Commands().ToList()));
+            new HelpCommandExecutor(game,commandProcessor.Commands().ToList()));
         
         commandProcessor.Register(
             new StatsCommandDefinition(), 

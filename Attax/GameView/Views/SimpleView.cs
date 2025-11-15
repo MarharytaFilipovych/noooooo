@@ -1,5 +1,4 @@
 using Model.Game.DTOs;
-using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
@@ -42,11 +41,11 @@ public class SimpleView : IGameView
         Console.WriteLine($"\nScore - X: {state.XCount}, O: {state.OCount}");
     }
 
-    public void DisplayGameStart(GameState state, string layoutName, GameMode mode)
+    public void DisplayGameStart(GameState state, string layoutName, GameMode.GameModeType modeType)
     {
         Console.Clear();
         Console.WriteLine($"Game started with layout: {layoutName}");
-        Console.WriteLine($"Mode: {mode}");
+        Console.WriteLine($"ModeType: {modeType}");
         UpdateBoard(state);
     }
 
@@ -129,7 +128,7 @@ public class SimpleView : IGameView
 
     public void DisplayModeOptions(List<(string DisplayName, string Description)> options)
     {
-        Console.WriteLine("Select game mode:");
+        Console.WriteLine("Select game modeType:");
         for (var i = 0; i < options.Count; i++)
         {
             Console.WriteLine($"{i + 1}. {options[i].DisplayName} - {options[i].Description}");

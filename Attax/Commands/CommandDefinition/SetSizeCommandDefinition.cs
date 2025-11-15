@@ -1,6 +1,6 @@
 using Command;
+using GameMode;
 using Model.Board;
-using Model.Game.Mode;
 
 namespace Commands.CommandDefinition;
 
@@ -39,5 +39,6 @@ public class SetSizeCommandDefinition : ICommandDefinition
         return true;
     }
     
-    public bool IsAvailableInMode(GameMode mode) => mode is GameMode.PvE or GameMode.PvP;
+    public bool IsAvailableInMode(GameModeType modeType) => 
+        modeType is GameModeType.PvE or GameModeType.PvP;
 }

@@ -1,15 +1,16 @@
+using Bot.Strategy;
 using Model.Game.Game;
 using Model.PlayerType;
 
-namespace Bot;
+namespace Bot.Orchestrator;
 
-public class BotOrchestrator(IBotStrategy strategy, int thinkingDelayMs = 500) : IBotOrchestrator
+public class BotOrchestrator(IBotStrategy strategy, BotOptions options) : IBotOrchestrator
 {
     private readonly IBotStrategy _strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
 
     public void MakeBotMove(AtaxxGameWithEvents game, PlayerType botPlayer)
     {
-        Thread.Sleep(thinkingDelayMs);
+        Thread.Sleep(options.ThinkingDelayMs);
 
         var validMoves = game.GetValidMoves(botPlayer);
         

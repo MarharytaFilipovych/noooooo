@@ -1,9 +1,7 @@
 ﻿using Model;
 using Model.Game.Game;
-using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
-using View;
 using View.Views;
 using ViewSwitcher;
 
@@ -38,12 +36,12 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
     
     private void OnHintRequested(List<Move.Move> moves) => View.DisplayHint(moves);
 
-    private void OnModeSet(GameMode gameMode) =>
-        View.DisplayMessage(gameMode == GameMode.PvE 
+    private void OnModeSet(GameMode.GameModeType gameModeType) =>
+        View.DisplayMessage(gameModeType == GameMode.GameModeType.PvE 
             ? "You are Player X, Bot is Player O" : "ENJOY!");
     
     private void OnGameStarted(Cell[,] board, string layoutName) =>
-        View.DisplayGameStart(game.GetGameState(), layoutName, game.GameMode.Mode);
+        View.DisplayGameStart(game.GetGameState(), layoutName, game.GameMode.ModeType);
 
     private void OnBoardUpdated(Cell[,] board) => View.UpdateBoard(game.GetGameState());
 

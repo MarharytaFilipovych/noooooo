@@ -1,5 +1,4 @@
 using Model.Game.DTOs;
-using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
@@ -94,13 +93,13 @@ public class EnhancedView : IGameView
         Console.WriteLine("│");
     }
 
-    public void DisplayGameStart(GameState state, string layoutName, GameMode mode)
+    public void DisplayGameStart(GameState state, string layoutName, GameMode.GameModeType modeType)
     {
         Console.Clear();
         Console.WriteLine("════════════════════════════════");
         Console.WriteLine("    Game started");
         Console.WriteLine($"    LayoutType: {layoutName}");
-        Console.WriteLine($"    Mode: {mode}");
+        Console.WriteLine($"    ModeType: {modeType}");
         Console.WriteLine("════════════════════════════════");
         UpdateBoard(state);
     }
@@ -231,7 +230,7 @@ public class EnhancedView : IGameView
     public void DisplayModeOptions(List<(string DisplayName, string Description)> options)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("=== Select Game Mode ===\n");
+        Console.WriteLine("=== Select Game ModeType ===\n");
         Console.ResetColor();
 
         var maxNameLength = options.Count != 0 ? options.Max(o => o.DisplayName.Length) : 0;

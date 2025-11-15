@@ -1,8 +1,9 @@
-using Bot;
+using Bot.Orchestrator;
 using Commands;
 using Commands.CommandProcessor;
 using Model.Game.Game;
-using Model.Game.Mode;
+using Model.Game.Settings;
+using GameMode.Factory;
 using View.Views;
 using ViewSwitcher;
 
@@ -13,7 +14,8 @@ public class GamePresenter(
     IViewSwitcher viewSwitcher,
     IBotOrchestrator botOrchestrator, 
     ICommandProcessor commandProcessor,
-    IGameModeFactory gameModeFactory) : IGamePresenter
+    IGameModeFactory gameModeFactory,
+    IGameSettings gameSettings) : IGamePresenter  
 {
     private IGameView View => viewSwitcher.CurrentView;
 
@@ -62,17 +64,26 @@ public class GamePresenter(
     private void SetMode()
     {
         var modes = gameModeFactory.GetAvailableModes();
-    
+        
         if (modes.Count == 0)
             throw new InvalidOperationException("No game modes were registered!");
-    
-        View.DisplayModeOptions(
-            modes.Select(m => (m.DisplayName, m.Description))
-                .ToList());
+        
+        DisplayModeOptions(modes);
         
         var selectedMode = GetModeSelection(modes);
-        game.GameMode = gameModeFactory.CreateMode(selectedMode.Mode);
+        
+        gameSettings.GameModeType = selectedMode.ModeType;
+        
         game.SetMode();
+    }
+
+    private void DisplayModeOptions(IReadOnlyList<GameModeOption> modes)
+    {
+        View.DisplayMessage("Select game mode:");
+        for (var i = 0; i < modes.Count; i++)
+        {
+            View.DisplayMessage($"{i + 1}. {modes[i].DisplayName} - {modes[i].Description}");
+        }
     }
 
     private GameModeOption GetModeSelection(IReadOnlyList<GameModeOption> modes)

@@ -1,7 +1,8 @@
+using GameMode;
+using GameMode.Factory;
 using Layout.Factory;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;
-using Model.Game.Mode;
 using Model.Game.Settings;
 using Model.Game.TurnTimer;
 using Model.Position;
@@ -13,13 +14,19 @@ using Move.Validator;
 
 namespace Model.Game.Game;
 
-public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
-    IMoveValidator validator, IMoveExecutor executor,
-    IMoveGenerator generator, IGameEndDetector endDetector,
-    IGameSettings settings, ICareTakerFactory careTakerFactory, 
-    IBoardLayoutFactory boardLayoutFactory)
+public class AtaxxGameWithEvents(
+    IStatsTracker statsTracker, 
+    ITurnTimer turnTimer,
+    IMoveValidator validator, 
+    IMoveExecutor executor,
+    IMoveGenerator generator, 
+    IGameEndDetector endDetector,
+    IGameSettings settings, 
+    ICareTakerFactory careTakerFactory, 
+    IBoardLayoutFactory boardLayoutFactory,
+    IGameModeFactory gameModeFactory)
     : AtaxxGame(statsTracker, turnTimer, validator, executor, 
-        generator, endDetector, settings, careTakerFactory, boardLayoutFactory)
+        generator, endDetector, settings, careTakerFactory, boardLayoutFactory, gameModeFactory)
 {
     public event Action<Cell[,], string>? GameStarted;
     public event Action<PlayerType.PlayerType>? PlayerWon;
@@ -29,12 +36,13 @@ public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTime
     public event Action<Move.Move, PlayerType.PlayerType>? MoveInvalid;
     public event Action<Cell[,]>? BoardUpdated;
     public event Action<List<Move.Move>>? HintRequested;
-    public event Action<GameMode>? ModeSet;
+    public event Action<GameModeType>? ModeSet;
     public event Action<GameStatistics>? StatsRequested; 
     public event Action<PlayerType.PlayerType>? TurnTimedOut;
     public event Action<bool, PlayerType.PlayerType>? MoveUndone;
     public event Action<List<(string Name, string Usage, string Description)>>? HelpRequested;
     public event Action<string>? ErrorOccurred;
+
 
     private void RaiseError(string message) => ErrorOccurred?.Invoke(message);
 
@@ -91,15 +99,15 @@ public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTime
         else PlayerWon?.Invoke(Winner);
     }
 
-    public void SetMode() => ModeSet?.Invoke(GameMode.Mode);
+    public void SetMode() => ModeSet?.Invoke(GameMode.ModeType);
 
     public void DisplayStats() => StatsRequested?.Invoke(Statistics);
 
     public new void UndoLastMove()
     {
-        if (GameMode.Mode !=  Mode.GameMode.PvE)
+        if (GameMode.ModeType != GameModeType.PvE)
         {
-            RaiseError("Undo is only available in Player vs Bot mode");
+            RaiseError("Undo is only available in Player vs Bot modeType");
             return;
         }
         

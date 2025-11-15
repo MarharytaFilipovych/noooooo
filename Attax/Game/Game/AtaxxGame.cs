@@ -1,10 +1,11 @@
+using GameMode;
+using GameMode.Factory;
+using GameMode.ModeConfigurations;
 using Layout.Factory;
 using Layout.Layout;
-using Layout.LayoutType;
 using Model.Game.CareTaker;
 using Model.Game.DTOs;
 using Model.Game.EndDetector;
-using Model.Game.Mode;
 using Model.Game.Settings;
 using Model.Game.TurnTimer;
 using Model.PlayerType;
@@ -22,6 +23,7 @@ public class AtaxxGame
 
     private Board.Board? _board;
     private IBoardLayout? _layout;
+    private IGameModeConfiguration? _gameMode;
 
     private readonly ITurnTimer _turnTimer;
     private readonly ICareTaker _careTaker;
@@ -33,8 +35,11 @@ public class AtaxxGame
     private readonly GameProgress _progress;
     private readonly IGameSettings _settings;
     private readonly IBoardLayoutFactory _boardLayoutFactory;
+    private readonly IGameModeFactory _gameModeFactory;
 
-    public GameModeConfiguration GameMode { get; set; } = GameModeConfiguration.CreatePvP();
+    public IGameModeConfiguration GameMode => _gameMode 
+        ?? throw new InvalidOperationException("Cannot access game mode before the game has started.");
+    
     protected GameStatistics Statistics => _statsTracker.GetStatistics();
 
     public PlayerType.PlayerType CurrentPlayer => _progress.CurrentPlayer;
@@ -57,7 +62,8 @@ public class AtaxxGame
         IGameEndDetector endDetector,
         IGameSettings settings,
         ICareTakerFactory careTakerFactory,
-        IBoardLayoutFactory boardLayoutFactory)
+        IBoardLayoutFactory boardLayoutFactory,
+        IGameModeFactory gameModeFactory)
     {
         _settings = settings;
         _statsTracker = statsTracker;
@@ -66,6 +72,7 @@ public class AtaxxGame
         _moveExecutor = executor;
         _moveGenerator = generator;
         _boardLayoutFactory = boardLayoutFactory;
+        _gameModeFactory = gameModeFactory;
         _endDetector = endDetector;
         _progress = new GameProgress();
         _turnTimer.TimeoutOccurred += HandleTimeout;
@@ -88,6 +95,10 @@ public class AtaxxGame
             ? _boardLayoutFactory.GetLayout(_settings.LayoutType.Value)
             : _boardLayoutFactory.GetRandomLayout();
 
+        _gameMode = _settings.GameModeType.HasValue
+            ? _gameModeFactory.GetConfiguration(_settings.GameModeType.Value)
+            : _gameModeFactory.GetDefaultConfiguration();
+
         _board.Initialize(_layout);
         _progress.Initialize();
         _turnTimer.StartTurn();
@@ -95,8 +106,8 @@ public class AtaxxGame
 
     public virtual bool MakeMove(Position.Position from, Position.Position to)
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot make move before the game has started.");
+        EnsureGameStarted();
+        
         if (IsEnded)
             throw new InvalidOperationException("Game has ended.");
 
@@ -104,7 +115,7 @@ public class AtaxxGame
 
         if (!_moveValidator.IsValidMove(_board, move, CurrentPlayer)) return false;
 
-        if (GameMode.Mode == Mode.GameMode.PvE && !GameMode.IsBot(CurrentPlayer))
+        if (_gameMode!.ModeType == GameModeType.PvE && !_gameMode.IsBot(CurrentPlayer))
             _careTaker.BackUp();
 
         ExecuteMove(move);
@@ -128,43 +139,37 @@ public class AtaxxGame
 
     public List<Move.Move> GetValidMoves()
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot get valid moves before the game has started.");
+        EnsureGameStarted();
         return _moveValidator.GetValidMoves(_board, CurrentPlayer);
     }
 
     public List<Move.Move> GetValidMoves(PlayerType.PlayerType player)
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot get valid moves before the game has started.");
+        EnsureGameStarted();
         return _moveValidator.GetValidMoves(_board, player);
     }
 
     public Cell GetCell(Position.Position pos)
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot access cells before the game has started.");
+        EnsureGameStarted();
         return _board.GetCell(pos);
     }
 
     public Cell[,] GetBoard()
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot access board before the game has started.");
+        EnsureGameStarted();
         return _board.GetCells();
     }
 
     public (int xCount, int oCount) GetPieceCounts()
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot count pieces before the game has started.");
+        EnsureGameStarted();
         return _board.CountPieces();
     }
 
     public GameState GetGameState()
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot get game state before the game has started.");
+        EnsureGameStarted();
 
         var (xCount, oCount) = GetPieceCounts();
         var cells = new CellState[_board.Size, _board.Size];
@@ -184,9 +189,7 @@ public class AtaxxGame
 
     private void ExecuteMove(Move.Move move)
     {
-        if (_board == null) return;
-
-        _moveExecutor.ExecuteMove(_board, move, CurrentPlayer);
+        _moveExecutor.ExecuteMove(_board!, move, CurrentPlayer);
         SwitchPlayer();
         CheckGameEnd();
     }
@@ -205,9 +208,7 @@ public class AtaxxGame
 
     private void CheckGameEnd()
     {
-        if (_board == null) return;
-
-        var result = _endDetector.CheckGameEnd(_board, _moveValidator, CurrentPlayer);
+        var result = _endDetector.CheckGameEnd(_board!, _moveValidator, CurrentPlayer);
 
         if (result.IsEnded)
         {
@@ -219,17 +220,13 @@ public class AtaxxGame
 
     public bool UndoLastMove()
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot undo move before the game has started.");
-
-        return GameMode.Mode == Mode.GameMode.PvE && _careTaker.Undo(UndoTimeWindowSeconds);
+        EnsureGameStarted();
+        return _gameMode!.ModeType == GameModeType.PvE && _careTaker.Undo(UndoTimeWindowSeconds);
     }
 
     public IMemento Save()
     {
-        if (_board == null)
-            throw new InvalidOperationException("Cannot save before the game has started.");
-
+        EnsureGameStarted();
         return new GameMemento(_board.Clone(), CurrentPlayer, TurnNumber);
     }
 
@@ -241,6 +238,12 @@ public class AtaxxGame
         _board = saved.Board;
         _progress.Restore(saved.CurrentPlayer, saved.TurnNumber);
         _turnTimer.ResetTurn();
+    }
+
+    private void EnsureGameStarted()
+    {
+        if (_board == null)
+            throw new InvalidOperationException("Cannot perform this operation before the game has started.");
     }
 
     private class GameMemento(Board.Board board, PlayerType.PlayerType currentPlayer, int turnNumber) : IMemento

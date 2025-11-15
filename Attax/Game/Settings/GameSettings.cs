@@ -1,4 +1,4 @@
-using Layout;
+using GameMode;
 using Layout.LayoutType;
 using Model.Board;
 
@@ -8,6 +8,7 @@ public class GameSettings : IGameSettings
 {
     private int _boardSize = BoardConstants.DefaultSize;
     private LayoutType? _layoutType;
+    private GameModeType? _gameModeType;
     private bool _isGameStarted;
     
     public int BoardSize
@@ -36,6 +37,18 @@ public class GameSettings : IGameSettings
                 throw new InvalidOperationException("You can't change the layout after game has started!!!");
             
             _layoutType = value;
+        }
+    }
+    
+    public GameModeType? GameModeType
+    {
+        get => _gameModeType;
+        set
+        {
+            if (_isGameStarted)
+                throw new InvalidOperationException("You can't change the game mode after game has started!!!");
+            
+            _gameModeType = value;
         }
     }
 

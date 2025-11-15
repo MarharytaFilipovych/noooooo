@@ -1,6 +1,6 @@
 using Command;
+using GameMode;
 using Layout.LayoutType;
-using Model.Game.Mode;
 
 namespace Commands.CommandDefinition;
 
@@ -34,7 +34,8 @@ public class ChooseLayoutCommandDefinition : ICommandDefinition
         return true;
     }
 
-    public bool IsAvailableInMode(GameMode mode) => mode is GameMode.PvE or GameMode.PvP;
+    public bool IsAvailableInMode(GameModeType modeType) => 
+        modeType is GameModeType.PvE or GameModeType.PvP;
 }
 
 

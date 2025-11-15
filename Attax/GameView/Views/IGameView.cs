@@ -1,5 +1,4 @@
 using Model.Game.DTOs;
-using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
@@ -9,7 +8,7 @@ public interface IGameView
 {
     void DisplayWelcome();
     void UpdateBoard(GameState state);
-    void DisplayGameStart(GameState state, string layoutName, GameMode mode);
+    void DisplayGameStart(GameState state, string layoutName, GameMode.GameModeType modeType);
     void DisplayTurn(PlayerType player, bool isBot);
     void DisplayMove(Move.Move move, PlayerType player, bool isBot);
     void DisplayInvalidMove(Move.Move move);
