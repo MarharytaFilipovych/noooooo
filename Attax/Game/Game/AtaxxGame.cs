@@ -1,8 +1,10 @@
 using Layout;
+using Layout.Factory;
 using Model.Game.CareTaker;
 using Model.Game.DTOs;
 using Model.Game.EndDetector;
 using Model.Game.Mode;
+using Model.Game.Settings;
 using Model.Game.TurnTimer;
 using Model.PlayerType;
 using Move.Executor;
@@ -27,7 +29,8 @@ public class AtaxxGame
     private readonly IGameEndDetector _endDetector;
     private readonly IStatsTracker _statsTracker;
     private readonly GameProgress _progress;
-    
+    private readonly IGameSettings _settings;
+
     public GameModeConfiguration GameMode { get; set; } = GameModeConfiguration.CreatePvP();
     protected GameStatistics Statistics => _statsTracker.GetStatistics();
     
@@ -38,18 +41,21 @@ public class AtaxxGame
     protected string LayoutName => _layout.Name;
 
     public AtaxxGame(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator, 
-        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector, IBoardLayout? layout = null)
+        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector,
+        IGameSettings settings, ICareTakerFactory careTakerFactory, 
+        IBoardLayoutFactory boardLayoutFactory, LayoutType? layoutType = null)
     {
+        _settings = settings;
         _statsTracker = statsTracker;
         _turnTimer = turnTimer;
         _moveValidator = validator;
         _moveExecutor = executor;
         _moveGenerator = generator;
-        _layout =  layout ?? BoardLayoutFactory.GetRandomLayout();
-        _careTaker = new CareTaker.CareTaker(this);
+        _layout =  layoutType.HasValue ? boardLayoutFactory.GetLayout(layoutType.Value) : boardLayoutFactory.GetRandomLayout();
         _endDetector = endDetector;
         _progress = new GameProgress();
         _turnTimer.TimeoutOccurred += HandleTimeout;
+        _careTaker = careTakerFactory.Create(this);
     }
     
     protected virtual void HandleTimeout()
@@ -60,7 +66,9 @@ public class AtaxxGame
 
     public virtual void StartGame(int? boardSize = null)
     {
-        _board = new Board.Board(boardSize);
+        _settings.MarkGameAsStarted();
+        var size = boardSize ?? _settings.BoardSize;
+        _board = new Board.Board(size);
         _board.Initialize(_layout);
         _progress.Initialize();
         _turnTimer.StartTurn();

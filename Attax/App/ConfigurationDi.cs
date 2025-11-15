@@ -5,10 +5,15 @@ using Commands.CommandProcessor;
 using ConsoleOutput;
 using Core;
 using Layout;
+using Layout.Factory;
 using Model;
+using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Game;
+using Model.Game.Mode;
+using Model.Game.Settings;
 using Model.Game.TurnTimer;
+using Model.PlayerType;
 using Move.Executor;
 using Move.Generator;
 using Move.Validator;
@@ -28,6 +33,9 @@ public static class Configuration
         var container = new DiContainer();
 
         ConfigureLayouts();
+        container.Register<IGameModeFactory, GameModeFactory>(Scope.Singleton);
+
+        container.Register<IGameSettings, GameSettings>(Scope.Singleton);
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
@@ -41,7 +49,7 @@ public static class Configuration
         container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
         container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
         container.Register<IBoardLayout, ClassicLayout>(Scope.Singleton);
-        
+        container.Register<ICareTakerFactory, CareTakerFactory>(Scope.Singleton);
         container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
 
         container.Register<ICommandProcessor, CommandProcessor>(Scope.Singleton);
@@ -67,15 +75,29 @@ public static class Configuration
 
     public static void ConfigureCommands(DiContainer container)
     {
+        var settings = container.Resolve<IGameSettings>();
         var game = container.Resolve<AtaxxGameWithEvents>();
         var commandProcessor = container.Resolve<CommandProcessor>();
         var viewSwitcher = container.Resolve<IViewSwitcher>();
-
+        commandProcessor.Register(new SetSizeCommandDefinition(), new SetSizeCommandExecutor(settings));
         commandProcessor.Register(new MoveCommandDefinition(), new MoveCommandExecutor(game));
         commandProcessor.Register(new SwitchViewCommandDefinition(), new SwitchViewCommandExecutor(viewSwitcher));
         commandProcessor.Register(new QuitCommandDefinition(), new QuitCommandExecutor());
         commandProcessor.Register(new HintCommandDefinition(), new HintCommandExecutor(game));
         commandProcessor.Register(new HelpCommandDefinition(), new HelpCommandExecutor(commandProcessor.Commands().ToList()));
         commandProcessor.Register(new StatsCommandDefinition(), new StatsCommandExecutor(game));
+    }
+
+    private static void RegisterDefaultModes(IGameModeFactory factory)
+    {
+        factory.RegisterMode(
+            new GameModeOption("pvp", "Player vs Player", "Two human players compete"),
+            GameModeConfiguration.CreatePvP
+        );
+
+        factory.RegisterMode(
+            new GameModeOption("pve", "Player vs Bot", "Play against AI opponent"),
+            () => GameModeConfiguration.CreatePvE(PlayerType.PlayerType.X)
+        );
     }
 }

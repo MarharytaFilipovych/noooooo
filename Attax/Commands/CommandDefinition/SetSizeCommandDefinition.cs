@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices.JavaScript;
 using Command;
+using Model.Board;
 
 namespace Commands.CommandDefinition;
 
@@ -28,7 +28,7 @@ public class SetSizeCommandDefinition : ICommandDefinition
             return false;
         }
 
-        if (size is < MinBoardSize or > MaxBoardSize)
+        if (size is < BoardConstants.MinBoardSize or > BoardConstants.MaxBoardSize)
         {
             error = $"Board size must be between {MinBoardSize} and {MaxBoardSize}.";
             return false;

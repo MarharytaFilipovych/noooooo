@@ -6,19 +6,17 @@ using System;
 
 public class Board
 {
-    private const int DefaultSize = 8;
-    private const int MinBoardSize = 5;
-    private const int MaxBoardSize = 5;
-
+    
     private readonly Cell[,] _cells;
 
     public int Size { get; }
 
     public Board(int? size = null)
     {
-        var boardSize = size ?? DefaultSize;
-        if (boardSize is < MinBoardSize or > MaxBoardSize) 
-            throw new ArgumentException("Board size must be at least 5");
+        var boardSize = size ?? BoardConstants.DefaultSize;
+        if (boardSize is < BoardConstants.MinBoardSize or > BoardConstants.MaxBoardSize) 
+            throw new ArgumentException($"Board size must be between {BoardConstants.MinBoardSize} " +
+                                        $"and {BoardConstants.MaxBoardSize}");
 
         Size = boardSize;
         _cells = new Cell[Size, Size];

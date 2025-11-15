@@ -1,6 +1,8 @@
 using Layout;
+using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Mode;
+using Model.Game.Settings;
 using Model.Game.TurnTimer;
 using Model.Position;
 using Stats;
@@ -13,8 +15,10 @@ namespace Model.Game.Game;
 
 public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
     IMoveValidator validator, IMoveExecutor executor,
-    IMoveGenerator generator, IGameEndDetector endDetector, IBoardLayout? boardLayout = null)
-    : AtaxxGame(statsTracker, turnTimer, validator, executor, generator, endDetector, boardLayout)
+    IMoveGenerator generator, IGameEndDetector endDetector,
+    IGameSettings settings, ICareTakerFactory careTakerFactory, IBoardLayout? boardLayout = null)
+    : AtaxxGame(statsTracker, turnTimer, validator, executor, 
+        generator, endDetector, settings, careTakerFactory, boardLayout)
 {
     public event Action<Cell[,], string>? GameStarted;
     public event Action<PlayerType.PlayerType>? PlayerWon;

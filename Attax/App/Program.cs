@@ -6,6 +6,7 @@ using Commands.CommandExecutor;
 using Commands.CommandProcessor;
 using ConsoleOutput;
 using Layout;
+using Layout.Factory;
 using Model;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;
