@@ -9,12 +9,10 @@ public class ViewSwitcher : IViewSwitcher
 {
     private readonly IViewFactory _viewFactory;
     public IGameView CurrentView { get; private set; }
-    public ViewType CurrentViewType { get; private set; }
+    public ViewType CurrentViewType { get; private set; } = ViewType.Simple;
 
-    public ViewSwitcher(IViewFactory viewFactory, ViewType initialViewType = ViewType.Simple)
+    public ViewSwitcher(IViewFactory viewFactory)
     {
-        CurrentViewType = initialViewType;
-        
         _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
 
         if ( _viewFactory.GetAvailableViews().Count == 0) 

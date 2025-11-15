@@ -3,21 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace Stats.Repository;
 
-public class JsonStatisticsRepository : IStatisticsRepository
+public class JsonStatisticsRepository(StatisticsOptions options) : IStatisticsRepository
 {
-    private readonly string? _filePath;
-    private const string FileName = "statistics.json";
-    private const string DirectoryName = "BeautifulStats";
-
-    public JsonStatisticsRepository(string? filePath = null)
-    {
-        if (!Directory.Exists(DirectoryName)) Directory.CreateDirectory(DirectoryName);
-
-        _filePath = GetFilePath(filePath ?? FileName);
-    }
+    private readonly string _filePath = GetFilePath(options.FileName, options.DirectoryName);
 
     public GameStatistics LoadStatistics()
     {
+        EnsureDirectoryExists(options.DirectoryName);
+        
         if (!File.Exists(_filePath)) return GameStatistics.Empty;
 
         try
@@ -34,10 +27,12 @@ public class JsonStatisticsRepository : IStatisticsRepository
 
     public void SaveStatistics(GameStatistics statistics)
     {
+        EnsureDirectoryExists(options.DirectoryName);
+        
         try
         {
             var json = JsonSerializer.Serialize(statistics, JsonOptions);
-            File.WriteAllText(_filePath!, json);
+            File.WriteAllText(_filePath, json);
         }
         catch (Exception ex)
         {
@@ -50,6 +45,12 @@ public class JsonStatisticsRepository : IStatisticsRepository
         if (File.Exists(_filePath)) File.Delete(_filePath);
     }
     
+    private static void EnsureDirectoryExists(string directoryName)
+    {
+        if (!Directory.Exists(directoryName)) 
+            Directory.CreateDirectory(directoryName);
+    }
+    
     private static readonly JsonSerializerOptions JsonOptions = new()
     { 
         WriteIndented = true,
@@ -57,8 +58,8 @@ public class JsonStatisticsRepository : IStatisticsRepository
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
     
-    private static string GetFilePath(string filepath) => 
-        Path.Combine(GetProjectRoot(), DirectoryName, $"{filepath}.json");
+    private static string GetFilePath(string fileName, string directoryName) => 
+        Path.Combine(GetProjectRoot(), directoryName, $"{fileName}.json");
     
     private static string GetProjectRoot()
     {
@@ -74,4 +75,5 @@ public class JsonStatisticsRepository : IStatisticsRepository
         return directory?.FullName ?? AppContext.BaseDirectory;
     }
 }
+
 

@@ -1,12 +1,12 @@
 using Model.Game.Game;
 using Model.PlayerType;
 
-namespace Bot;
+namespace Bot.Strategy;
 
-public class RandomBotStrategy(Random? random = null) : IBotStrategy
+public class RandomBotStrategy : IBotStrategy
 {
-    private readonly Random _random = random ?? new Random();
-
+    private readonly Random _random = new();
+    
     public string Name => "Random Bot";
 
     public Move.Move SelectMove(List<Move.Move> validMoves, AtaxxGame game, PlayerType botPlayer)

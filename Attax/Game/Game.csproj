@@ -10,6 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Board\Board.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\GameMode\GameMode.csproj" />
       <ProjectReference Include="..\Move\Move.csproj" />
       <ProjectReference Include="..\Stats\Stats.csproj" />
       <ProjectReference Include="..\TurnTimer\TurnTimer.csproj" />

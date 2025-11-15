@@ -15,18 +15,36 @@ public class MoveValidator : IMoveValidator
         return validMoves;
     }
     
-    public bool IsValidMove(Board board, Move move, Model.PlayerType.PlayerType player)
+    public bool IsValidMove(Board board, Move move, Model.PlayerType.PlayerType player, out string? error)
     {
-        if (!board.IsValidPosition(move.From) || !board.IsValidPosition(move.To))
+        error = null;
+
+        if (!move.IsValid)
+        {
+            error = $"Incorrect move distance: {move.From} to {move.To}. " +
+                    "Moves must be a distance of 1 (Clone) or 2 (Jump).";
             return false;
+        }
+        
+        if (!board.IsValidPosition(move.From) || !board.IsValidPosition(move.To))
+        {
+            error = $"One of the positions ({move.From} or {move.To}) is out of board bounds!!!!!";
+            return false;
+        }
 
-        if (!move.IsValid) return false;
+        if (!board.GetCell(move.From).IsOccupied || board.GetCell(move.From).OccupiedBy != player)
+        {
+            error = $"The starting position {move.From} is not occupied by your piece, you dummy!";
+            return false;
+        }
 
-        var fromCell = board.GetCell(move.From);
-        if (!fromCell.IsOccupied || fromCell.OccupiedBy != player) return false;
+        if (!board.GetCell(move.To).IsEmpty)
+        {
+            error = $"The target position {move.To} is not empty (it is occupied or blocked). Be careful!";
+            return false;
+        }
 
-        var toCell = board.GetCell(move.To);
-        return toCell.IsEmpty;
+        return true;
     }
 
     
@@ -63,8 +81,7 @@ public class MoveValidator : IMoveValidator
                 var to = new Model.Position.Position(from.Row + dRow, from.Col + dCol);
                 var move = new Move(from, to);
 
-                if (IsValidMove(board, move, player))
-                    moves.Add(move);
+                if (IsValidMove(board, move, player, out var _)) moves.Add(move);
             }
         }
 

@@ -1,6 +1,12 @@
-using Layout;
+using GameMode;
+using GameMode.Factory;
+using GameMode.ModeConfigurations;
+using GameMode.ModeType;
+using Layout.Factory;
+using Layout.LayoutType;
+using Model.Game.CareTaker;
 using Model.Game.EndDetector;
-using Model.Game.Mode;
+using Model.Game.Settings;
 using Model.Game.TurnTimer;
 using Model.Position;
 using Stats;
@@ -11,7 +17,19 @@ using Move.Validator;
 
 namespace Model.Game.Game;
 
-public class AtaxxGameWithEvents : AtaxxGame
+public class AtaxxGameWithEvents(
+    IStatsTracker statsTracker, 
+    ITurnTimer turnTimer,
+    IMoveValidator validator, 
+    IMoveExecutor executor,
+    IMoveGenerator generator, 
+    IGameEndDetector endDetector,
+    IGameSettings settings, 
+    ICareTakerFactory careTakerFactory, 
+    IBoardLayoutFactory boardLayoutFactory,
+    IGameModeFactory gameModeFactory)
+    : AtaxxGame(statsTracker, turnTimer, validator, executor, 
+        generator, endDetector, settings, careTakerFactory, boardLayoutFactory, gameModeFactory)
 {
     public event Action<Cell[,], string>? GameStarted;
     public event Action<PlayerType.PlayerType>? PlayerWon;
@@ -21,31 +39,27 @@ public class AtaxxGameWithEvents : AtaxxGame
     public event Action<Move.Move, PlayerType.PlayerType>? MoveInvalid;
     public event Action<Cell[,]>? BoardUpdated;
     public event Action<List<Move.Move>>? HintRequested;
-    public event Action<GameMode>? ModeSet;
+    public event Action<string>? ModeSet;
     public event Action<GameStatistics>? StatsRequested; 
     public event Action<PlayerType.PlayerType>? TurnTimedOut;
     public event Action<bool, PlayerType.PlayerType>? MoveUndone;
+    public event Action<List<(string Name, string Usage, string Description)>>? HelpRequested;
+    public event Action<string>? ErrorOccurred;
+    
+    private void RaiseError(string message) => ErrorOccurred?.Invoke(message);
 
-    public AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer, IMoveValidator validator,
-        IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector, int boardSize = DefaultBoardSize)
-        : base(statsTracker, turnTimer, validator, executor, generator, endDetector, boardSize) { }
-    
-    
-    public AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTimer,
-        IMoveValidator validator, IMoveExecutor executor, IMoveGenerator generator, IGameEndDetector endDetector,
-         IBoardLayout layout, int boardSize = DefaultBoardSize)
-        : base(statsTracker, turnTimer, validator, executor, generator, endDetector, boardSize, layout) { }
-    
-   
+    public void RequestHelp(List<(string Name, string Usage, string Description)> availableCommands) 
+        => HelpRequested?.Invoke(availableCommands);
+
     protected override void HandleTimeout()
     {
         if (!IsEnded) TurnTimedOut?.Invoke(CurrentPlayer);
         base.HandleTimeout();
     }
 
-    public override void StartGame()
+    public override void StartGame(int? boardSize = null)
     {
-        base.StartGame();
+        base.StartGame(boardSize);
         GameStarted?.Invoke(GetBoard(), LayoutName);
         TurnChanged?.Invoke(CurrentPlayer);
     }
@@ -54,10 +68,21 @@ public class AtaxxGameWithEvents : AtaxxGame
     {
         var move = new Move.Move(from, to);
         var previousPlayer = CurrentPlayer;
-        var success = base.MakeMove(from, to);
+
+        var moveResult = base.MakeMove(from, to);
+    
+        if (!moveResult)
+        {
+            if (!string.IsNullOrEmpty(LastValidationError))
+            {
+                RaiseError(LastValidationError); 
+                LastValidationError = null;
+                return moveResult;
+            }
+        }
         
-        PublishMoveResult(move, previousPlayer, success);
-        return success;
+        PublishMoveSuccess(move, previousPlayer);
+        return moveResult;
     }
 
     public bool MakeMove(string fromNotation, string toNotation)
@@ -66,42 +91,36 @@ public class AtaxxGameWithEvents : AtaxxGame
         return PositionParser.TryParse(toNotation, out var to) && MakeMove(from, to);
     }
 
-    private void PublishMoveResult(Move.Move move, PlayerType.PlayerType previousPlayer, bool success)
+    private void PublishMoveSuccess(Move.Move move, PlayerType.PlayerType previousPlayer)
     {
-        if (success)
-        {
-            MoveMade?.Invoke(move, previousPlayer);
-            BoardUpdated?.Invoke(GetBoard());
-            
-            if (!IsEnded) 
-                TurnChanged?.Invoke(CurrentPlayer);
-            else 
-                EndGame();
-        }
-        else 
-        {
-            MoveInvalid?.Invoke(move, previousPlayer);
-        }
+        MoveMade?.Invoke(move, previousPlayer);
+        BoardUpdated?.Invoke(GetBoard());
+        if (!IsEnded) TurnChanged?.Invoke(CurrentPlayer);
+        else EndGame();
     }
 
     public void ShowHint() => HintRequested?.Invoke(GetValidMoves());
 
     public void EndGame()
     {
-        if (Winner == PlayerType.PlayerType.None) 
-            GameDrawn?.Invoke();
-        else 
-            PlayerWon?.Invoke(Winner);
+        if (Winner == PlayerType.PlayerType.None) GameDrawn?.Invoke();
+        else PlayerWon?.Invoke(Winner);
     }
 
-    public void SetMode() => ModeSet?.Invoke(GameMode.Mode);
-
+    public void SetMode() => ModeSet?.Invoke(GameMode.ModeType.GetDescription());
     public void DisplayStats() => StatsRequested?.Invoke(Statistics);
 
     public new void UndoLastMove()
     {
+        if (GameMode.ModeType != GameModeType.PvE)
+        {
+            RaiseError("Undo is only available in Player vs Bot modeType");
+            return;
+        }
+        
         var success = base.UndoLastMove();
         MoveUndone?.Invoke(success, CurrentPlayer);
+        
         
         if (success)
         {

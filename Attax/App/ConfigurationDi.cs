@@ -1,20 +1,33 @@
 using Bot;
+using Bot.Orchestrator;
+using Bot.Strategy;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
 using Commands.CommandProcessor;
+using Configurator;
 using ConsoleOutput;
 using Core;
-using Layout;
+using GameMode;
+using GameMode.Factory;
+using GameMode.ModeConfigurations;
+using GameMode.ModeType;
+using Layout.Factory;
+using Layout.Layout;
 using Model;
+using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Game;
+using Model.Game.Settings;
 using Model.Game.TurnTimer;
+using Model.PlayerType;
 using Move.Executor;
 using Move.Generator;
 using Move.Validator;
 using Presenter;
+using Stats;
 using Stats.Repository;
 using Stats.Tracker;
+using TurnTimer;
 using View.ViewFactory;
 using View.Views;
 using ViewSwitcher;
@@ -27,49 +40,47 @@ public static class Configuration
     {
         var container = new DiContainer();
 
-        ConfigureLayouts();
+        container.Register<StatisticsOptions, StatisticsOptions>(Scope.Singleton);
+        container.Register<BotOptions, BotOptions>(Scope.Singleton);
+        container.Register<TurnTimerOptions, TurnTimerOptions>(Scope.Singleton);
+        
+        container.Register<IGameSettings, GameSettings>(Scope.Singleton);
+        container.Register<IBoardLayoutFactory, BoardLayoutFactory>(Scope.Singleton);
+        container.Register<IGameModeFactory, GameModeFactory>(Scope.Singleton);
         
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
+        
         container.Register<IBotStrategy, RandomBotStrategy>(Scope.Singleton);
+        container.Register<IBotOrchestrator, BotOrchestrator>(Scope.Singleton);
 
         container.Register<IMoveExecutor, MoveExecutor>(Scope.Singleton);
         container.Register<IMoveValidator, MoveValidator>(Scope.Singleton);
         container.Register<IMoveGenerator, RandomMoveGenerator>(Scope.Singleton);
         container.Register<IGameEndDetector, GameEndDetector>(Scope.Singleton);
-        container.Register<ITurnTimer, TurnTimer>(Scope.Singleton);
+        container.Register<ITurnTimer, Model.Game.TurnTimer.TurnTimer>(Scope.Singleton);
+        container.Register<ICareTakerFactory, CareTakerFactory>(Scope.Singleton);
+        
         container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
         container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
-        container.Register<IBoardLayout, ClassicLayout>(Scope.Singleton);
-
-        /*var statsTracker = container.Resolve<IStatsTracker>();
-        var turnTimer = container.Resolve<ITurnTimer>();
-        var moveValidator = container.Resolve<IMoveValidator>();
-        var moveExecutor = container.Resolve<IMoveExecutor>();
-        var moveGenerator = container.Resolve<IMoveGenerator>();
-        var boardLayout = container.Resolve<IBoardLayout>();
-        var endDetector = container.Resolve<IGameEndDetector>();
-
-        var game = new AtaxxGameWithEvents(statsTracker, turnTimer, moveValidator,
-            moveExecutor, moveGenerator, endDetector, boardLayout);
-
-        container.RegisterInstance(game);*/
         
         container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
 
         container.Register<ICommandProcessor, CommandProcessor>(Scope.Singleton);
-        container.Register<IBotOrchestrator, BotOrchestrator>(Scope.Singleton);
+        
+        container.Register<IGameConfigurator, GameConfigurator>(Scope.Singleton);
         container.Register<IGamePresenter, GamePresenter>(Scope.Singleton);
 
         return container;
     }
 
-    private static void ConfigureLayouts()
+    public static void ConfigureLayouts(DiContainer container)
     {
-        BoardLayoutFactory.RegisterLayout(new ClassicLayout());
-        BoardLayoutFactory.RegisterLayout(new CrossLayout());
-        BoardLayoutFactory.RegisterLayout(new CenterBlockLayout());
+        var factory = container.Resolve<IBoardLayoutFactory>();
+        factory.RegisterLayout(new ClassicLayout());
+        factory.RegisterLayout(new CrossLayout());
+        factory.RegisterLayout(new CenterBlockLayout());
     }
 
     public static void ConfigureViews(DiContainer container)
@@ -79,17 +90,54 @@ public static class Configuration
         factory.RegisterView(ViewType.Enhanced, () => new EnhancedView());
     }
 
+    public static void ConfigureGameModes(DiContainer container)
+    {
+        var factory = container.Resolve<IGameModeFactory>();
+        
+        factory.RegisterMode(
+            new GameModeOption(GameModeType.PvP, "Player vs Player", "Two human players compete"),
+            new PvPConfiguration()
+        );
+
+        factory.RegisterMode(
+            new GameModeOption(GameModeType.PvE, "Player vs Bot", "Play against AI opponent"),
+            new PvEConfiguration(PlayerType.X) 
+        );
+    }
+
     public static void ConfigureCommands(DiContainer container)
     {
+        var commandProcessor = container.Resolve<ICommandProcessor>();
         var game = container.Resolve<AtaxxGameWithEvents>();
-        var commandProcessor = container.Resolve<CommandProcessor>();
         var viewSwitcher = container.Resolve<IViewSwitcher>();
-
-        commandProcessor.Register(new MoveCommandDefinition(), new MoveCommandExecutor(game));
-        commandProcessor.Register(new SwitchViewCommandDefinition(), new SwitchViewCommandExecutor(viewSwitcher));
-        commandProcessor.Register(new QuitCommandDefinition(), new QuitCommandExecutor());
-        commandProcessor.Register(new HintCommandDefinition(), new HintCommandExecutor(game));
-        commandProcessor.Register(new HelpCommandDefinition(), new HelpCommandExecutor(commandProcessor.Commands().ToList()));
-        commandProcessor.Register(new StatsCommandDefinition(), new StatsCommandExecutor(game));
+        var settings = container.Resolve<IGameSettings>();
+        
+        commandProcessor.Register(
+            new MoveCommandDefinition(), 
+            new MoveCommandExecutor(game));
+        
+        commandProcessor.Register(
+            new SwitchViewCommandDefinition(), 
+            new SwitchViewCommandExecutor(viewSwitcher));
+        
+        commandProcessor.Register(
+            new QuitCommandDefinition(), 
+            new QuitCommandExecutor());
+        
+        commandProcessor.Register(
+            new HintCommandDefinition(), 
+            new HintCommandExecutor(game));
+        
+        commandProcessor.Register(
+            new HelpCommandDefinition(), 
+            new HelpCommandExecutor(game,commandProcessor.Commands().ToList()));
+        
+        commandProcessor.Register(
+            new StatsCommandDefinition(), 
+            new StatsCommandExecutor(game));
+        
+        commandProcessor.Register(
+            new UndoCommandDefinition(), 
+            new UndoCommandExecutor(game));
     }
 }

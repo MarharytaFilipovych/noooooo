@@ -1,19 +1,20 @@
+using TurnTimer;
+
 namespace Model.Game.TurnTimer;
 
 using System.Timers;
 
-
 public class TurnTimer : IDisposable, ITurnTimer
 {
-    private const int TimeoutSeconds = 20;
     private readonly Timer _timer;
     private readonly int _timeoutMilliseconds;
     private bool _isRunning;
+    
     public event Action? TimeoutOccurred;
 
-    public TurnTimer(int timeoutSeconds = TimeoutSeconds)
+    public TurnTimer(TurnTimerOptions options)
     {
-        _timeoutMilliseconds = timeoutSeconds * 1000;
+        _timeoutMilliseconds = options.TimeoutSeconds * 1000;
         _timer = new Timer();
         _timer.Elapsed += OnTimerElapsed;
         _timer.AutoReset = false;

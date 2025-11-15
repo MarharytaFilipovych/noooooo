@@ -1,5 +1,4 @@
 using Model.Game.DTOs;
-using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
@@ -42,11 +41,11 @@ public class SimpleView : IGameView
         Console.WriteLine($"\nScore - X: {state.XCount}, O: {state.OCount}");
     }
 
-    public void DisplayGameStart(GameState state, string layoutName, GameMode mode)
+    public void DisplayGameStart(GameState state, string layoutName, string mode)
     {
         Console.Clear();
         Console.WriteLine($"Game started with layout: {layoutName}");
-        Console.WriteLine($"Mode: {mode}");
+        Console.WriteLine($"ModeType: {mode}");
         UpdateBoard(state);
     }
 
@@ -86,18 +85,6 @@ public class SimpleView : IGameView
 
     public void DisplayError(string error) =>Console.WriteLine($"Error: {error}");
 
-    public string DisplayModeSelection()
-    {
-        
-        Console.WriteLine("Select game mode:");
-        Console.WriteLine("1 - Player vs Player");
-        Console.WriteLine("2 - Player vs Bot");
-        
-        Console.Write("Enter choice (1 or 2)");
-
-        return Console.ReadLine() ?? string.Empty;
-    }
-
     public void DisplayStatistics(GameStatistics stats)
     {
         const int labelWidth = 15;
@@ -129,5 +116,26 @@ public class SimpleView : IGameView
             ? $"Undo successful! Player {player}'s last move was reverted."
             : $"Undo failed! No move to revert for Player {player}.");
     }
+    
+    public void DisplayHelp(List<(string Name, string Usage, string Description)> commands)
+    {
+        Console.WriteLine("Available commands:");
+        foreach (var cmd in commands)
+        {
+            Console.WriteLine($"*{cmd.Name}: {cmd.Description}. Usage: {cmd.Usage}");
+        }
+    }
+
+    public void DisplayModeOptions(List<(string DisplayName, string Description)> options)
+    {
+        Console.WriteLine("Select game modeType:");
+        for (var i = 0; i < options.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {options[i].DisplayName} - {options[i].Description}");
+        }
+    }
+    
+    public void DisplaySetModeResult(string modeName) =>
+        DisplayMessage($"Game mode set to {modeName}.");
 }
 

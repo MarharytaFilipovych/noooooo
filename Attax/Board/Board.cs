@@ -1,4 +1,5 @@
 using Layout;
+using Layout.Layout;
 
 namespace Model.Board;
 
@@ -6,25 +7,30 @@ using System;
 
 public class Board
 {
+    
     private readonly Cell[,] _cells;
 
     public int Size { get; }
 
-    public Board(int size)
+    public Board(int? size = null)
     {
-        if (size < 5) throw new ArgumentException("Board size must be at least 5");
+        var boardSize = size ?? BoardConstants.DefaultSize;
+        if (boardSize is < BoardConstants.MinBoardSize or > BoardConstants.MaxBoardSize) 
+            throw new ArgumentException($"Board size must be between {BoardConstants.MinBoardSize} " +
+                                        $"and {BoardConstants.MaxBoardSize}");
 
-        Size = size;
-        _cells = new Cell[size, size];
-        
-        for (var row = 0; row < size; row++)
+        Size = boardSize;
+        _cells = new Cell[Size, Size];
+
+        for (var row = 0; row < Size; row++)
         {
-            for (var col = 0; col < size; col++)
+            for (var col = 0; col < Size; col++)
             {
                 _cells[row, col] = new Cell();
             }
         }
     }
+
 
     public void Initialize(IBoardLayout layout)
     {

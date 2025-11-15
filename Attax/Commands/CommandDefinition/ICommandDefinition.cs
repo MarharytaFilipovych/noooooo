@@ -1,4 +1,6 @@
 using Command;
+using GameMode;
+using GameMode.ModeType;
 
 namespace Commands.CommandDefinition;
 
@@ -8,4 +10,5 @@ public interface ICommandDefinition
     string Description { get; }
     string Usage { get; }
     bool TryParse(string[] args, out ICommand? command, out string? error);
+    bool IsAvailableInMode(GameModeType modeType);
 }

@@ -1,5 +1,4 @@
 using Model.Game.DTOs;
-using Model.Game.Mode;
 using Model.PlayerType;
 using Stats;
 
@@ -94,13 +93,13 @@ public class EnhancedView : IGameView
         Console.WriteLine("│");
     }
 
-    public void DisplayGameStart(GameState state, string layoutName, GameMode mode)
+    public void DisplayGameStart(GameState state, string layoutName, string mode)
     {
         Console.Clear();
         Console.WriteLine("════════════════════════════════");
         Console.WriteLine("    Game started");
         Console.WriteLine($"    LayoutType: {layoutName}");
-        Console.WriteLine($"    Mode: {mode}");
+        Console.WriteLine($"    ModeType: {mode}");
         Console.WriteLine("════════════════════════════════");
         UpdateBoard(state);
     }
@@ -155,17 +154,6 @@ public class EnhancedView : IGameView
         Console.WriteLine($"OHHHHH NOOOOOOOOOOO🥺🥺🥺🥺🥺: {error}");
         Console.ResetColor();
     }
-
-    public string DisplayModeSelection()
-    {
-        Console.WriteLine("🐷🐷🐷Select game mode:");
-        Console.WriteLine("1 - Player vs Player🤗");
-        Console.WriteLine("2 - Player vs Bot👀");
-        
-        Console.Write("Enter choice (1 or 2)❤️❤️❤️");
-
-        return Console.ReadLine() ?? string.Empty;
-    }
     
     public void DisplayStatistics(GameStatistics stats)
     {
@@ -209,6 +197,69 @@ public class EnhancedView : IGameView
         }
 
         Console.WriteLine("╚════════════════════════════════════════╝\n");
+    }
+
+    public void DisplayHelp(List<(string Name, string Usage, string Description)> commands)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("=== Available Commands ===\n");
+        Console.ResetColor();
+
+        var maxNameLength = commands.Count != 0 ? commands.Max(c => c.Name.Length) : 0;
+
+        foreach (var cmd in commands)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            var namePadded = cmd.Name.PadRight(maxNameLength);
+            Console.Write($"* {namePadded}");
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($" | {cmd.Description}");
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine($"    Usage: {cmd.Usage}\n");
+
+            Console.ResetColor();
+        }
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("==========================\n");
+        Console.ResetColor();
+    }
+
+    public void DisplayModeOptions(List<(string DisplayName, string Description)> options)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("=== Select Game ModeType ===\n");
+        Console.ResetColor();
+
+        var maxNameLength = options.Count != 0 ? options.Max(o => o.DisplayName.Length) : 0;
+
+        for (var i = 0; i < options.Count; i++)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write($"{i + 1}. ");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            var namePadded = options[i].DisplayName.PadRight(maxNameLength);
+            Console.Write(namePadded);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($" - {options[i].Description}");
+
+            Console.ResetColor();
+        }
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("\n========================\n");
+        Console.ResetColor();
+    }
+    
+    public void DisplaySetModeResult(string modeName)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"🐷 Mode Selected: {modeName}.");
+        Console.ResetColor();
     }
 
 }

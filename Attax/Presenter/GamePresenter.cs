@@ -1,27 +1,28 @@
-using Bot;
+using Bot.Orchestrator;
 using Commands;
-using Commands.CommandDefinition;
-using Commands.CommandExecutor;
 using Commands.CommandProcessor;
+using Configurator;
 using Model.Game.Game;
-using Model.Game.Mode;
-using Model.PlayerType;
-using View;
-using View.Views;
+using Model.Game.Settings;
 using ViewSwitcher;
 
 namespace Presenter;
 
 public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
-    BotOrchestrator botOrchestrator, CommandProcessor commandProcessor) : IGamePresenter
+    IBotOrchestrator botOrchestrator, ICommandProcessor commandProcessor,
+    IGameSettings gameSettings, IGameConfigurator gameConfigurator) : IGamePresenter
 {
-    private IGameView View => viewSwitcher.CurrentView;
-
     public void Start()
     {
-        View.DisplayWelcome();
-        SetMode();
-        game.StartGame();
+        viewSwitcher.CurrentView.DisplayWelcome();
+        gameSettings.Reset();
+        
+        gameConfigurator.Configure();
+        
+        game.StartGame();  
+        game.SetMode();   
+        game.StartTimer();
+        
         GameLoop();
     }
     
@@ -29,42 +30,38 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
     {
         while (!game.IsEnded)
         {
-            if (IsCurrentPlayerBot()) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
-            else
-            {
-                var input = View.DisplayGetInput();
-                if (string.IsNullOrWhiteSpace(input)) continue;
-                var result = commandProcessor.ProcessCommand(ParseInput(input), out var error);
-                if (result == ExecuteResult.Break)break;
-                if (result == ExecuteResult.Error) View.DisplayError(error!);
-            }
+            if (game.GameMode.IsBot(game.CurrentPlayer)) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
+            else ProcessPlayerInput();
         }
+        
         game.EndGame();
     }
 
-    private bool IsCurrentPlayerBot() => game.GameMode.IsBot(game.CurrentPlayer);
+    private void ProcessPlayerInput()
+    {
+        var input = viewSwitcher.CurrentView.DisplayGetInput();
+        if (string.IsNullOrWhiteSpace(input)) return;
+        
+        var args = ParseInput(input);
+        var result = commandProcessor.ProcessCommand(args, out var error);
+        
+        switch (result)
+        {
+            case ExecuteResult.Continue:
+                game.ResetTimer(); 
+                break;
+            case ExecuteResult.Break:
+                Environment.Exit(0);
+                break;
+            case ExecuteResult.Error:
+                viewSwitcher.CurrentView.DisplayError(error!);
+                game.ResetTimer();
+                break;
+        }
+    }
     
     private static string[] ParseInput(string input) =>                     
         input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-    private void SetMode()
-    {
-        var input = View.DisplayModeSelection();
-        
-        game.GameMode = input switch
-        {
-            "1" => GameModeConfiguration.CreatePvP(),
-            "2" => CreatePvEWithUndo(),
-            _ => GameModeConfiguration.CreatePvP()
-        };
-        
-        game.SetMode();
-    }
-        
-    private GameModeConfiguration CreatePvEWithUndo()
-    {
-        var config = GameModeConfiguration.CreatePvE(PlayerType.X);
-        commandProcessor.Register(new UndoCommandDefinition(), new UndoCommandExecutor(game));
-        return config;
-    }
 }
+
+

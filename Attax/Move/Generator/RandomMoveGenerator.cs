@@ -3,7 +3,7 @@ using Move.Validator;
 
 namespace Move.Generator;
 
-public class RandomMoveGenerator(MoveValidator validator) : IMoveGenerator
+public class RandomMoveGenerator(IMoveValidator validator) : IMoveGenerator
 {
     private readonly Random _random = new();
 

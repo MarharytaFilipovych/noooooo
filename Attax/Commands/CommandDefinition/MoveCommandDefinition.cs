@@ -1,4 +1,6 @@
 using Command;
+using GameMode;
+using GameMode.ModeType;
 using Model.Position;
 
 namespace Commands.CommandDefinition;
@@ -35,4 +37,7 @@ public class MoveCommandDefinition : ICommandDefinition
         command = new MoveCommand(from, to);
         return true;
     }
+    
+    public bool IsAvailableInMode(GameModeType modeType) => 
+        modeType is GameModeType.PvE or GameModeType.PvP;
 }
