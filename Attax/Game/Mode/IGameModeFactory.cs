@@ -2,8 +2,8 @@ namespace Model.Game.Mode;
 
 public interface IGameModeFactory
 {
-    GameModeConfiguration RegisterMode(string modeKey);
+    void RegisterMode(GameMode mode);
     IReadOnlyList<GameModeOption> GetAvailableModes();
 }
 
-public record GameModeOption(string Key, string DisplayName, string Description);
+public record GameModeOption(GameMode Mode, string DisplayName, string Description);

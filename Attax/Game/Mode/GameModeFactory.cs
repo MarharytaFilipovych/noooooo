@@ -2,18 +2,18 @@ namespace Model.Game.Mode;
 
 public class GameModeFactory : IGameModeFactory
 {
-    private readonly Dictionary<string, Func<GameModeConfiguration>> _modeCreators = new();
-    private readonly Dictionary<string, GameModeOption> _modeOptions = new();
+    private readonly Dictionary<GameMode, Func<GameModeConfiguration>> _modeCreators = new();
+    private readonly Dictionary<GameMode, GameModeOption> _modeOptions = new();
 
     public void RegisterMode(GameModeOption option, Func<GameModeConfiguration> creator)
     {
-        _modeCreators[option.Key] = creator ?? throw new ArgumentNullException(nameof(creator));
-        _modeOptions[option.Key] = option;
+        _modeCreators[option.Mode] = creator ?? throw new ArgumentNullException(nameof(creator));
+        _modeOptions[option.Mode] = option;
     }
 
-    public GameModeConfiguration RegisterMode(string modeKey) =>
-        !_modeCreators.TryGetValue(modeKey, out var creator) 
-            ? throw new InvalidOperationException($"Unknown game mode: {modeKey}")
+    public GameModeConfiguration RegisterMode(GameMode mode) =>
+        !_modeCreators.TryGetValue(mode, out var creator) 
+            ? throw new InvalidOperationException($"Unknown game mode: {mode}")
             : creator();
 
     public IReadOnlyList<GameModeOption> GetAvailableModes() => 
