@@ -7,11 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Bot\Bot.csproj" />
-      <ProjectReference Include="..\Commands\Commands.csproj" />
-      <ProjectReference Include="..\Configurator\Configurator.csproj" />
       <ProjectReference Include="..\GameView\GameView.csproj" />
-      <ProjectReference Include="..\ViewSwitcher\ViewSwitcher.csproj" />
     </ItemGroup>
 
 </Project>

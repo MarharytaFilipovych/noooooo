@@ -1,31 +1,28 @@
 using Bot.Orchestrator;
 using Commands;
 using Commands.CommandProcessor;
+using Configurator;
 using Model.Game.Game;
 using Model.Game.Settings;
-using GameMode.Factory;
-using View.Views;
 using ViewSwitcher;
 
 namespace Presenter;
 
-public class GamePresenter(
-    AtaxxGameWithEvents game, 
-    IViewSwitcher viewSwitcher,
-    IBotOrchestrator botOrchestrator, 
-    ICommandProcessor commandProcessor,
-    IGameModeFactory gameModeFactory,
-    IGameSettings gameSettings) : IGamePresenter  
+public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
+    IBotOrchestrator botOrchestrator, ICommandProcessor commandProcessor,
+    IGameSettings gameSettings, IGameConfigurator gameConfigurator) : IGamePresenter
 {
-    private IGameView View => viewSwitcher.CurrentView;
-
     public void Start()
     {
-        View.DisplayWelcome();
+        viewSwitcher.CurrentView.DisplayWelcome();
         gameSettings.Reset();
-        SetMode();
-        game.StartGame();
+        
+        gameConfigurator.Configure();
+        
+        game.StartGame();  
+        game.SetMode();   
         game.StartTimer();
+        
         GameLoop();
     }
     
@@ -33,7 +30,7 @@ public class GamePresenter(
     {
         while (!game.IsEnded)
         {
-            if (IsCurrentPlayerBot()) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
+            if (game.GameMode.IsBot(game.CurrentPlayer)) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
             else ProcessPlayerInput();
         }
         
@@ -42,10 +39,11 @@ public class GamePresenter(
 
     private void ProcessPlayerInput()
     {
-        var input = View.DisplayGetInput();
+        var input = viewSwitcher.CurrentView.DisplayGetInput();
         if (string.IsNullOrWhiteSpace(input)) return;
         
-        var result = commandProcessor.ProcessCommand(ParseInput(input), out var error);
+        var args = ParseInput(input);
+        var result = commandProcessor.ProcessCommand(args, out var error);
         
         switch (result)
         {
@@ -56,44 +54,14 @@ public class GamePresenter(
                 Environment.Exit(0);
                 break;
             case ExecuteResult.Error:
-                View.DisplayError(error!);
+                viewSwitcher.CurrentView.DisplayError(error!);
                 game.ResetTimer();
                 break;
         }
     }
-
-    private bool IsCurrentPlayerBot() => game.GameMode.IsBot(game.CurrentPlayer);
     
     private static string[] ParseInput(string input) =>                     
         input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-    private void SetMode()
-    {
-        var modes = gameModeFactory.GetAvailableModes();
-        
-        if (modes.Count == 0)
-            throw new InvalidOperationException("No game modes were registered!");
-        
-        var optionsForView = modes
-            .Select(m => (m.DisplayName, m.Description))
-            .ToList();
-            
-        View.DisplayModeOptions(optionsForView);
-        
-        var selectedMode = GetModeSelection(modes);
-        
-        gameSettings.GameModeType = selectedMode.ModeType;
-        game.SetMode();
-    }
-
-    private GameModeOption GetModeSelection(IReadOnlyList<GameModeOption> modes)
-    {
-        var input = View.DisplayGetInput();
-        
-        if (int.TryParse(input, out var choice) && choice > 0 && choice <= modes.Count)
-            return modes[choice - 1];
-        
-        View.DisplayError($"Invalid selection. Defaulting to {modes[0].DisplayName}");
-        return modes[0];
-    }
 }
+
+

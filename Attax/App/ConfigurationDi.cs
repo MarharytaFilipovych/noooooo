@@ -4,6 +4,7 @@ using Bot.Strategy;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
 using Commands.CommandProcessor;
+using Configurator;
 using ConsoleOutput;
 using Core;
 using GameMode;
@@ -68,6 +69,7 @@ public static class Configuration
 
         container.Register<ICommandProcessor, CommandProcessor>(Scope.Singleton);
         
+        container.Register<IGameConfigurator, GameConfigurator>(Scope.Singleton);
         container.Register<IGamePresenter, GamePresenter>(Scope.Singleton);
 
         return container;
@@ -137,13 +139,5 @@ public static class Configuration
         commandProcessor.Register(
             new UndoCommandDefinition(), 
             new UndoCommandExecutor(game));
-        
-        commandProcessor.Register(
-            new SetSizeCommandDefinition(), 
-            new SetSizeCommandExecutor(settings));
-        
-        commandProcessor.Register(
-            new ChooseLayoutCommandDefinition(), 
-            new ChooseLayoutCommandExecutor(settings));
     }
 }
