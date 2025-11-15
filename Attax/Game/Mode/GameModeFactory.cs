@@ -7,11 +7,13 @@ public class GameModeFactory : IGameModeFactory
 
     public void RegisterMode(GameModeOption option, Func<GameModeConfiguration> creator)
     {
+        ArgumentNullException.ThrowIfNull(option);
+
         _modeCreators[option.Mode] = creator ?? throw new ArgumentNullException(nameof(creator));
         _modeOptions[option.Mode] = option;
     }
 
-    public GameModeConfiguration RegisterMode(GameMode mode) =>
+    public GameModeConfiguration CreateMode(GameMode mode) =>
         !_modeCreators.TryGetValue(mode, out var creator) 
             ? throw new InvalidOperationException($"Unknown game mode: {mode}")
             : creator();

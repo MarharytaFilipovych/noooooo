@@ -1,7 +1,5 @@
 using Bot;
 using Commands;
-using Commands.CommandDefinition;
-using Commands.CommandExecutor;
 using Commands.CommandProcessor;
 using Model.Game.Game;
 using Model.Game.Mode;
@@ -10,8 +8,11 @@ using ViewSwitcher;
 
 namespace Presenter;
 
-public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
-    BotOrchestrator botOrchestrator, CommandProcessor commandProcessor,
+public class GamePresenter(
+    AtaxxGameWithEvents game, 
+    IViewSwitcher viewSwitcher,
+    IBotOrchestrator botOrchestrator, 
+    ICommandProcessor commandProcessor,
     IGameModeFactory gameModeFactory) : IGamePresenter
 {
     private IGameView View => viewSwitcher.CurrentView;
@@ -28,19 +29,29 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
     {
         while (!game.IsEnded)
         {
-            if (IsCurrentPlayerBot()) 
-                botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
-            else
-            {
-                var input = View.DisplayGetInput();
-                if (string.IsNullOrWhiteSpace(input)) continue;
-                
-                var result = commandProcessor.ProcessCommand(ParseInput(input), out var error);
-                if (result == ExecuteResult.Break) break;
-                if (result == ExecuteResult.Error) View.DisplayError(error!);
-            }
+            if (IsCurrentPlayerBot()) botOrchestrator.MakeBotMove(game, game.CurrentPlayer);
+            else ProcessPlayerInput();
         }
+        
         game.EndGame();
+    }
+
+    private void ProcessPlayerInput()
+    {
+        var input = View.DisplayGetInput();
+        if (string.IsNullOrWhiteSpace(input)) return;
+        
+        var result = commandProcessor.ProcessCommand(ParseInput(input), out var error);
+        
+        switch (result)
+        {
+            case ExecuteResult.Break:
+                Environment.Exit(0);
+                break;
+            case ExecuteResult.Error:
+                View.DisplayError(error!);
+                break;
+        }
     }
 
     private bool IsCurrentPlayerBot() => game.GameMode.IsBot(game.CurrentPlayer);
@@ -52,29 +63,33 @@ public class GamePresenter(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher,
     {
         var modes = gameModeFactory.GetAvailableModes();
         
+        if (modes.Count == 0)
+            throw new InvalidOperationException("No game modes were registered!");
+        
+        DisplayModeOptions(modes);
+        
+        var selectedMode = GetModeSelection(modes);
+        game.GameMode = gameModeFactory.CreateMode(selectedMode.Mode);
+        game.SetMode();
+    }
+
+    private void DisplayModeOptions(IReadOnlyList<GameModeOption> modes)
+    {
         View.DisplayMessage("Select game mode:");
         for (var i = 0; i < modes.Count; i++)
         {
             View.DisplayMessage($"{i + 1}. {modes[i].DisplayName} - {modes[i].Description}");
         }
-        
+    }
+
+    private GameModeOption GetModeSelection(IReadOnlyList<GameModeOption> modes)
+    {
         var input = View.DisplayGetInput();
         
         if (int.TryParse(input, out var choice) && choice > 0 && choice <= modes.Count)
-        {
-            var selectedMode = modes[choice - 1];
-            game.GameMode = gameModeFactory.CreateMode(selectedMode.Key);
-            
-            if (selectedMode.Key == "pve")
-                commandProcessor.Register(new UndoCommandDefinition(), new UndoCommandExecutor(game));
-        }
-        else
-        {
-            var defaultMode = modes[0];
-            game.GameMode = gameModeFactory.CreateMode(defaultMode.Key);
-            View.DisplayMessage($"Invalid selection. Defaulting to {defaultMode.DisplayName}");
-        }
+            return modes[choice - 1];
         
-        game.SetMode();
+        View.DisplayMessage($"Invalid selection. Defaulting to {modes[0].DisplayName}");
+        return modes[0];
     }
 }
