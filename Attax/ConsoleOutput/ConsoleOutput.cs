@@ -28,6 +28,9 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         game.TurnTimedOut += OnTurnTimeOut;
         game.MoveUndone += OnMoveUndo;
         viewSwitcher.ViewSelected += OnViewSelected;
+        game.HelpRequested += OnHelpRequested;
+        game.ErrorOccurred += OnErrorOccurred;
+
     }
 
     private void OnMoveUndo(bool success, PlayerType playerType) =>
@@ -71,4 +74,9 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
     private void OnStatsRequested(GameStatistics statistics) => View.DisplayStatistics(statistics);
 
     private void OnTurnTimeOut(PlayerType playerType) => View.DisplayElapsedTimeOutMessage(playerType);
+    
+    private void OnHelpRequested(List<(string Name, string Usage, string Description)> commands) =>
+        View.DisplayHelp(commands);
+    
+    private void OnErrorOccurred(string error) => View.DisplayError(error);
 }

@@ -1,6 +1,6 @@
 using Command;
 using Layout.LayoutType;
-using ICommand = System.Windows.Input.ICommand;
+using Model.Game.Mode;
 
 namespace Commands.CommandDefinition;
 
@@ -34,6 +34,7 @@ public class ChooseLayoutCommandDefinition : ICommandDefinition
         return true;
     }
 
+    public bool IsAvailableInMode(GameMode mode) => mode is GameMode.PvE or GameMode.PvP;
 }
 
 

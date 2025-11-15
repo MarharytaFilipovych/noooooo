@@ -18,8 +18,9 @@ public interface IGameView
     void DisplayMessage(string message);
     string DisplayGetInput();
     void DisplayError(string error);
-    string DisplayModeSelection();
     void DisplayStatistics(GameStatistics statistics);
     void DisplayElapsedTimeOutMessage(PlayerType playerType);
     void DisplayUndo(bool success, PlayerType player);
+    void DisplayHelp(List<(string Name, string Usage, string Description)> commands);
+    void DisplayModeOptions(List<(string DisplayName, string Description)> options);
 }

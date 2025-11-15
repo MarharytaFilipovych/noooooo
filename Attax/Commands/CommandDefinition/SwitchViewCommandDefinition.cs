@@ -1,4 +1,5 @@
 using Command;
+using Model.Game.Mode;
 
 namespace Commands.CommandDefinition;
 
@@ -15,4 +16,6 @@ public class SwitchViewCommandDefinition : ICommandDefinition
         error = null;
         return true;
     }
+    
+    public bool IsAvailableInMode(GameMode mode) => mode is GameMode.PvE or GameMode.PvP;
 }

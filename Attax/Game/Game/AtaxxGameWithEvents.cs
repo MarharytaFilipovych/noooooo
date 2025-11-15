@@ -33,7 +33,13 @@ public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTime
     public event Action<GameStatistics>? StatsRequested; 
     public event Action<PlayerType.PlayerType>? TurnTimedOut;
     public event Action<bool, PlayerType.PlayerType>? MoveUndone;
+    public event Action<List<(string Name, string Usage, string Description)>>? HelpRequested;
+    public event Action<string>? ErrorOccurred;
 
+    private void RaiseError(string message) => ErrorOccurred?.Invoke(message);
+
+    public void RequestHelp(List<(string Name, string Usage, string Description)> availableCommands) 
+        => HelpRequested?.Invoke(availableCommands);
 
     protected override void HandleTimeout()
     {
@@ -91,8 +97,15 @@ public class AtaxxGameWithEvents(IStatsTracker statsTracker, ITurnTimer turnTime
 
     public new void UndoLastMove()
     {
+        if (GameMode.Mode !=  Mode.GameMode.PvE)
+        {
+            RaiseError("Undo is only available in Player vs Bot mode");
+            return;
+        }
+        
         var success = base.UndoLastMove();
         MoveUndone?.Invoke(success, CurrentPlayer);
+        
         
         if (success)
         {

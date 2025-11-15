@@ -117,7 +117,7 @@ public static class Configuration
         
         commandProcessor.Register(
             new HelpCommandDefinition(), 
-            new HelpCommandExecutor(commandProcessor.Commands().ToList()));
+            new HelpCommandExecutor(game, commandProcessor.Commands().ToList()));
         
         commandProcessor.Register(
             new StatsCommandDefinition(), 
