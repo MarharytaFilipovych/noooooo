@@ -4,12 +4,15 @@ using Layout.LayoutType;
 using Model.Board;
 using Model.Game.Settings;
 using View.Views;
+using ViewSwitcher;
 
 namespace Configurator;
 
-public class GameConfigurator(IGameView view, IGameModeFactory gameModeFactory,
+public class GameConfigurator(IViewSwitcher viewSwitcher, IGameModeFactory gameModeFactory,
     IBoardLayoutFactory layoutFactory, IGameSettings gameSettings) : IGameConfigurator
 {
+    private IGameView View => viewSwitcher.CurrentView;
+    
     public void Configure()
     {
         ConfigureMode();
@@ -28,7 +31,7 @@ public class GameConfigurator(IGameView view, IGameModeFactory gameModeFactory,
             .Select(m => (m.DisplayName, m.Description))
             .ToList();
             
-        view.DisplayModeOptions(optionsForView);
+        View.DisplayModeOptions(optionsForView);
         
         var selectedMode = GetModeSelection(modes);
         gameSettings.GameModeType = selectedMode.ModeType;
@@ -36,24 +39,24 @@ public class GameConfigurator(IGameView view, IGameModeFactory gameModeFactory,
 
     private GameModeOption GetModeSelection(IReadOnlyList<GameModeOption> modes)
     {
-        var input = view.DisplayGetInput();
+        var input = View.DisplayGetInput();
         
         if (int.TryParse(input, out var choice) && choice > 0 && choice <= modes.Count)
             return modes[choice - 1];
         
-        view.DisplayError($"Invalid selection. Defaulting to {modes[0].DisplayName}");
+        View.DisplayError($"Invalid selection. Defaulting to {modes[0].DisplayName}");
         return modes[0];
     }
 
     private void ConfigureBoardSize()
     {
-        view.DisplayMessage($"Select board size ({BoardConstants.MinBoardSize}-{BoardConstants.MaxBoardSize}) [default: {BoardConstants.DefaultSize}]:");
+        View.DisplayMessage($"Select board size ({BoardConstants.MinBoardSize}-{BoardConstants.MaxBoardSize}) [default: {BoardConstants.DefaultSize}]:");
         
-        var input = view.DisplayGetInput();
+        var input = View.DisplayGetInput();
         
         if (string.IsNullOrWhiteSpace(input))
         {
-            view.DisplayMessage($"Using default board size: {BoardConstants.DefaultSize}");
+            View.DisplayMessage($"Using default board size: {BoardConstants.DefaultSize}");
             return;
         }
         
@@ -61,35 +64,35 @@ public class GameConfigurator(IGameView view, IGameModeFactory gameModeFactory,
             size is >= BoardConstants.MinBoardSize and <= BoardConstants.MaxBoardSize)
         {
             gameSettings.BoardSize = size;
-            view.DisplayMessage($"Board size set to: {size}x{size}");
+            View.DisplayMessage($"Board size set to: {size}x{size}");
         }
-        else view.DisplayError($"Invalid size. Using default: {BoardConstants.DefaultSize}");
+        else View.DisplayError($"Invalid size. Using default: {BoardConstants.DefaultSize}");
     }
 
     private void ConfigureLayout()
     {
         var layouts = layoutFactory.GetAvailableLayouts();
         
-        view.DisplayMessage("Select board layout:");
+        View.DisplayMessage("Select board layout:");
         
         for (var i = 0; i < layouts.Count; i++)
         {
-            view.DisplayMessage($"{i + 1}. {layouts[i].GetDescription()}");
+            View.DisplayMessage($"{i + 1}. {layouts[i].GetDescription()}");
         }
         
-        var input = view.DisplayGetInput();
+        var input = View.DisplayGetInput();
         
         if (string.IsNullOrWhiteSpace(input) || input == "0")
         {
-            view.DisplayMessage("Random layout will be selected");
+            View.DisplayMessage("Random layout will be selected");
             return;
         }
         
         if (int.TryParse(input, out var choice) && choice > 0 && choice <= layouts.Count)
         {
             gameSettings.LayoutType = layouts[choice - 1];
-            view.DisplayMessage($"Layout set to: {layouts[choice - 1].GetDescription()}");
+            View.DisplayMessage($"Layout set to: {layouts[choice - 1].GetDescription()}");
         }
-        else view.DisplayMessage("Invalid selection. Random layout will be selected");
+        else View.DisplayMessage("Invalid selection. Random layout will be selected");
     }
 }
