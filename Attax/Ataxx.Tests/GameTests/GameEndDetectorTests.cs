@@ -24,7 +24,6 @@ namespace Ataxx.Tests.Game.EndDetector
             _mockValidator = new Mock<IMoveValidator>();
             _board = new Board(7);
             
-            // Initialize board with a simple layout (no blocked cells)
             var mockLayout = new Mock<IBoardLayout>();
             mockLayout.Setup(l => l.IsBlocked(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(false);
@@ -34,18 +33,14 @@ namespace Ataxx.Tests.Game.EndDetector
         [Test]
         public void CheckGameEnd_PlayerXEliminated_PlayerOWins()
         {
-            // Clear the board first by creating a new one without initialization
             _board = new Board(7);
             var mockLayout = new Mock<IBoardLayout>();
             mockLayout.Setup(l => l.IsBlocked(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces
             _board.GetCell(new Position(0, 0)).Clear();
             _board.GetCell(new Position(6, 6)).Clear();
-            
-            // Add only O piece
             _board.GetCell(new Position(3, 3)).OccupyBy(PlayerType.O);
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
@@ -57,18 +52,14 @@ namespace Ataxx.Tests.Game.EndDetector
         [Test]
         public void CheckGameEnd_PlayerOEliminated_PlayerXWins()
         {
-            // Clear the board first
             _board = new Board(7);
             var mockLayout = new Mock<IBoardLayout>();
             mockLayout.Setup(l => l.IsBlocked(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
-            
-            // Add only X piece
             _board.GetCell(new Position(3, 3)).OccupyBy(PlayerType.X);
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.O);
@@ -102,13 +93,11 @@ namespace Ataxx.Tests.Game.EndDetector
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces first
             _board.GetCell(new Position(0, 0)).Clear();
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
             _board.GetCell(new Position(6, 6)).Clear();
             
-            // Fill entire board
             for (var row = 0; row < 7; row++)
             {
                 for (var col = 0; col < 7; col++)
@@ -133,7 +122,6 @@ namespace Ataxx.Tests.Game.EndDetector
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces first
             _board.GetCell(new Position(0, 0)).Clear();
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
@@ -176,7 +164,6 @@ namespace Ataxx.Tests.Game.EndDetector
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces first
             _board.GetCell(new Position(0, 0)).Clear();
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
@@ -206,7 +193,6 @@ namespace Ataxx.Tests.Game.EndDetector
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces first
             _board.GetCell(new Position(0, 0)).Clear();
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
@@ -229,9 +215,6 @@ namespace Ataxx.Tests.Game.EndDetector
         [Test]
         public void CheckGameEnd_CurrentPlayerHasMoves_GameContinues()
         {
-            // Don't recreate board, use the one from SetUp which is properly initialized
-            
-            // Clear only the O pieces from corners
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
             
@@ -243,10 +226,8 @@ namespace Ataxx.Tests.Game.EndDetector
                 new MoveClass(new Position(3, 3), new Position(3, 4))
             };
 
-            // Setup mock to return valid moves for current player
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
                 .Returns(validMoves);
-            // Mock can return anything for opponent since we have moves for current player
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.O))
                 .Returns(new System.Collections.Generic.List<MoveClass>());
 
@@ -259,20 +240,15 @@ namespace Ataxx.Tests.Game.EndDetector
         [Test]
         public void CheckGameEnd_OpponentHasMoves_GameContinues()
         {
-            // Don't recreate board, use the one from SetUp
-            
-            // Clear only the O pieces from corners
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();
             
             _board.GetCell(new Position(3, 3)).OccupyBy(PlayerType.X);
             _board.GetCell(new Position(4, 4)).OccupyBy(PlayerType.O);
 
-            // Current player has no moves
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
                 .Returns(new System.Collections.Generic.List<MoveClass>());
             
-            // But opponent has moves
             var opponentMoves = new System.Collections.Generic.List<MoveClass>
             {
                 new MoveClass(new Position(4, 4), new Position(4, 5))
@@ -295,7 +271,6 @@ namespace Ataxx.Tests.Game.EndDetector
                 .Returns(false);
             _board.Initialize(mockLayout.Object);
             
-            // Clear corner pieces first
             _board.GetCell(new Position(0, 0)).Clear();
             _board.GetCell(new Position(0, 6)).Clear();
             _board.GetCell(new Position(6, 0)).Clear();

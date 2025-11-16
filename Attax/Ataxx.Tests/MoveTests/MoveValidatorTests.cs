@@ -84,10 +84,10 @@ namespace Ataxx.Tests.Move.Validator
 
             var diagonalTargets = new[]
             {
-                new Position(2, 2), // Up-left
-                new Position(2, 4), // Up-right
-                new Position(4, 2), // Down-left
-                new Position(4, 4)  // Down-right
+                new Position(2, 2),
+                new Position(2, 4),
+                new Position(4, 2),
+                new Position(4, 4)
             };
 
             foreach (var to in diagonalTargets)
@@ -214,18 +214,14 @@ namespace Ataxx.Tests.Move.Validator
         [Test]
         public void IsValidMove_ToPositionOutOfBounds_ReturnsFalse()
         {
-            // Use position (0,2) to (0,7) - distance is 5, so it will fail distance check first
-            // But the validator checks distance before bounds, so we need a position
-            // that's within distance 2 but out of bounds
             var from = new Position(6, 6);
-            var to = new Position(8, 8); // Out of bounds but distance 2
+            var to = new Position(8, 8);
             _board.GetCell(from).OccupyBy(PlayerType.X);
             var move = new MoveClass(from, to);
 
             var isValid = _validator.IsValidMove(_board, move, PlayerType.X, out var error);
 
             Assert.That(isValid, Is.False);
-            // Since distance is 2 (valid), it should check bounds
             Assert.That(error, Does.Contain("out of board bounds"));
         }
 

@@ -128,9 +128,9 @@ namespace Ataxx.Tests.Move.Executor
 
             var converted = _executor.ExecuteMove(_board, move, PlayerType.X);
 
-            Assert.That(converted.Count, Is.EqualTo(8));  // Changed from 7 to 8
+            Assert.That(converted.Count, Is.EqualTo(8));
             Assert.That(_board.GetCell(new Position(2, 2)).OccupiedBy, Is.EqualTo(PlayerType.X));
-            Assert.That(_board.GetCell(new Position(2, 3)).OccupiedBy, Is.EqualTo(PlayerType.X));  // Now gets converted
+            Assert.That(_board.GetCell(new Position(2, 3)).OccupiedBy, Is.EqualTo(PlayerType.X));
             Assert.That(_board.GetCell(new Position(2, 4)).OccupiedBy, Is.EqualTo(PlayerType.X));
             Assert.That(_board.GetCell(new Position(3, 2)).OccupiedBy, Is.EqualTo(PlayerType.X));
             Assert.That(_board.GetCell(new Position(3, 4)).OccupiedBy, Is.EqualTo(PlayerType.X));
