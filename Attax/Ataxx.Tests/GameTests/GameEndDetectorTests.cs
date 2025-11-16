@@ -71,7 +71,7 @@ namespace Ataxx.Tests.Game.EndDetector
         [Test]
         public void CheckGameEnd_BothPlayersHavePieces_GameNotEnded()
         {
-            var validMoves = new System.Collections.Generic.List<MoveClass>
+            var validMoves = new List<MoveClass>
             {
                 new MoveClass(new Position(0, 0), new Position(0, 1))
             };
@@ -174,9 +174,9 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(6, 6)).OccupyBy(PlayerType.O);
 
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.O))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
 
@@ -202,9 +202,9 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(6, 6)).OccupyBy(PlayerType.O);
 
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.O))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
 
@@ -221,7 +221,7 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(3, 3)).OccupyBy(PlayerType.X);
             _board.GetCell(new Position(4, 4)).OccupyBy(PlayerType.O);
 
-            var validMoves = new System.Collections.Generic.List<MoveClass>
+            var validMoves = new List<MoveClass>
             {
                 new MoveClass(new Position(3, 3), new Position(3, 4))
             };
@@ -229,7 +229,7 @@ namespace Ataxx.Tests.Game.EndDetector
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
                 .Returns(validMoves);
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.O))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
 
@@ -247,9 +247,9 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(4, 4)).OccupyBy(PlayerType.O);
 
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
             
-            var opponentMoves = new System.Collections.Generic.List<MoveClass>
+            var opponentMoves = new List<MoveClass>
             {
                 new MoveClass(new Position(4, 4), new Position(4, 5))
             };
@@ -281,7 +281,7 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(6, 5)).OccupyBy(PlayerType.O);
 
             _mockValidator.Setup(v => v.GetValidMoves(_board, It.IsAny<PlayerType>()))
-                .Returns(new System.Collections.Generic.List<MoveClass>());
+                .Returns(new List<MoveClass>());
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
 
