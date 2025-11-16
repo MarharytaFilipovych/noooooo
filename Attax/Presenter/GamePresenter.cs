@@ -14,14 +14,11 @@ namespace Presenter;
 public class GamePresenter(
     AtaxxGameWithEvents game,
     IViewSwitcher viewSwitcher,
-    IBotStrategyFactory botStrategyFactory,
+    IBotOrchestrator botOrchestrator,
     ICommandProcessor commandProcessor,
     IGameSettings gameSettings,
-    IGameConfigurator gameConfigurator,
-    BotOptions botOptions) : IGamePresenter
+    IGameConfigurator gameConfigurator) : IGamePresenter
 {
-    private IBotOrchestrator? _botOrchestrator;
-
     public void Start()
     {
         viewSwitcher.CurrentView.DisplayWelcome();
@@ -31,13 +28,6 @@ public class GamePresenter(
 
         game.StartGame();
         game.SetMode();
-
-        if (game.GameMode is PvEConfiguration pveConfiguration)
-        {
-            var botStrategy = botStrategyFactory.GetStrategy(pveConfiguration.BotDifficulty);
-            _botOrchestrator = new BotOrchestrator(botStrategy, botOptions);
-        }
-
         game.StartTimer();
 
         GameLoop();
@@ -47,10 +37,9 @@ public class GamePresenter(
     {
         while (!game.IsEnded)
         {
-            if (game.GameMode is PvEConfiguration pveConfiguration && pveConfiguration.IsBot(game.CurrentPlayer) &&
-                _botOrchestrator != null)
+            if (game.GameMode.IsBot(game.CurrentPlayer))
             {
-                HandleBotTurn(pveConfiguration);
+                HandleBotTurn();
             }
             else ProcessPlayerInput();
         }
@@ -58,15 +47,16 @@ public class GamePresenter(
         game.EndGame();
     }
 
-    private void HandleBotTurn(PvEConfiguration pvEConfiguration)
+    private void HandleBotTurn()
     {
-        var suggestedMove = _botOrchestrator!.SuggestMove(game, pvEConfiguration.BotPlayer);
+        var config = (PvEConfiguration)game.GameMode;
+        var suggestedMove = botOrchestrator.SuggestMove(game, config.BotPlayer);
 
         if (suggestedMove == null)
         {
             return;
         }
-        
+
         game.MakeMove(suggestedMove.From, suggestedMove.To);
     }
 

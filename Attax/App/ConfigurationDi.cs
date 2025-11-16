@@ -1,6 +1,7 @@
 using Bot;
 using Bot.BotFactory;
 using Bot.Evaluation;
+using Bot.Orchestrator;
 using Bot.Strategy;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
@@ -53,6 +54,7 @@ public static class Configuration
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
 
         container.Register<IBotStrategyFactory, BotStrategyFactory>(Scope.Singleton);
+        container.Register<IBotOrchestrator, BotOrchestrator>(Scope.Singleton);
 
         container.Register<IMoveExecutor, MoveExecutor>(Scope.Singleton);
         container.Register<IMoveValidator, MoveValidator>(Scope.Singleton);
