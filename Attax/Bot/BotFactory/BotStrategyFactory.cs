@@ -23,5 +23,4 @@ public class BotStrategyFactory : IBotStrategyFactory
             ? strategy
             : throw new ArgumentException($"Unknown difficulty: {difficulty}");
     }
-    
 }

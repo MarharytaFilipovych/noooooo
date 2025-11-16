@@ -1,3 +1,4 @@
+using GameMode.BotDifficultyFactory;
 using GameMode.Factory;
 using GameMode.ModeConfigurations;
 using GameMode.ModeType;
@@ -14,10 +15,10 @@ public class GameConfigurator(
     IViewSwitcher viewSwitcher,
     IGameModeFactory gameModeFactory,
     IBoardLayoutFactory layoutFactory,
-    IGameSettings gameSettings) : IGameConfigurator
+    IGameSettings gameSettings,
+    IBotDifficultyFactory botDifficultyFactory) : IGameConfigurator
 {
     private IGameView View => viewSwitcher.CurrentView;
-    private BotDifficulty? _botDifficulty;
 
     public void Configure()
     {
@@ -50,20 +51,19 @@ public class GameConfigurator(
 
     private void ConfigureBotDifficulty()
     {
-        View.DisplayBotDifficultyOptions();
+        var difficulties = botDifficultyFactory.GetAvailableDifficulties();
+        if (difficulties.Count == 0)
+            throw new InvalidOperationException("No bot difficulties were registered!");
+        var optionsForView = difficulties
+            .Select(d => (d.DisplayName, d.Description))
+            .ToList();
 
-        var input = View.DisplayGetInput();
+        View.DisplayBotDifficultyOptions(optionsForView);
 
-        _botDifficulty = input switch
-        {
-            "1" => BotDifficulty.Easy,
-            "2" => BotDifficulty.Hard,
-            _ => BotDifficulty.Easy
-        };
+        var selectedDifficulty = GetDifficultySelection(difficulties);
+        gameSettings.BotDifficulty = selectedDifficulty.Difficulty;
 
-        gameSettings.BotDifficulty = _botDifficulty;
-
-        View.DisplayMessage($"Selected bot difficulty: {_botDifficulty}");
+        View.DisplayMessage($"Selected bot difficulty: {selectedDifficulty.DisplayName}");
     }
 
     private GameModeOption GetModeSelection(IReadOnlyList<GameModeOption> modes)
@@ -75,6 +75,17 @@ public class GameConfigurator(
 
         View.DisplayError($"Invalid selection. Defaulting to {modes[0].DisplayName}");
         return modes[0];
+    }
+
+    private BotDifficultyOption GetDifficultySelection(IReadOnlyList<BotDifficultyOption> difficulties)
+    {
+        var input = View.DisplayGetInput();
+
+        if (int.TryParse(input, out var choice) && choice > 0 && choice <= difficulties.Count)
+            return difficulties[choice - 1];
+
+        View.DisplayError($"Invalid selection. Defaulting to {difficulties[0].DisplayName}");
+        return difficulties[0];
     }
 
     private void ConfigureBoardSize()

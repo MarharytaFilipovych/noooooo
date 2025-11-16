@@ -267,13 +267,31 @@ public class EnhancedView : IGameView
         Console.ResetColor();
     }
 
-    public void DisplayBotDifficultyOptions()
+    public void DisplayBotDifficultyOptions(List<(string DisplayName, string Description)> options)
     {
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("╔════════════════════════════════════╗");
         Console.WriteLine("║     SELECT BOT DIFFICULTY          ║");
         Console.WriteLine("╠════════════════════════════════════╣");
-        Console.WriteLine("║  1. Easy Bot                       ║");
-        Console.WriteLine("║  2. Hard Bot                       ║");
+        Console.ResetColor();
+        var maxNameLength = options.Count != 0 ? options.Max(o => o.DisplayName.Length) : 0;
+
+        for (var i = 0; i < options.Count; i++)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write($"║  {i + 1}. ");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            var namePadded = options[i].DisplayName.PadRight(maxNameLength);
+            Console.Write(namePadded);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($" - {options[i].Description}");
+            Console.ResetColor();
+        }
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("╚════════════════════════════════════╝");
+        Console.ResetColor();
     }
 }

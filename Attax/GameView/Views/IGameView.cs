@@ -23,5 +23,5 @@ public interface IGameView
     void DisplayHelp(List<(string Name, string Usage, string Description)> commands);
     void DisplayModeOptions(List<(string DisplayName, string Description)> options);
     void DisplaySetModeResult(string modeName);
-    void DisplayBotDifficultyOptions();
+    void DisplayBotDifficultyOptions(List<(string DisplayName, string Description)> options);
 }

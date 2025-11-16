@@ -7,6 +7,7 @@ var container = Configuration.ConfigureContainer();
 Configuration.ConfigureLayouts(container);
 Configuration.ConfigureViews(container);
 Configuration.ConfigureGameModes(container);
+Configuration.ConfigureBotDifficulties(container);
 Configuration.ConfigureBotStrategies(container);
 Configuration.ConfigureCommands(container);
 

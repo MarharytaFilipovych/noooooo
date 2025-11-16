@@ -9,6 +9,7 @@ using Commands.CommandProcessor;
 using Configurator;
 using ConsoleOutput;
 using Core;
+using GameMode.BotDifficultyFactory;
 using GameMode.Factory;
 using GameMode.ModeConfigurations;
 using GameMode.ModeType;
@@ -48,6 +49,7 @@ public static class Configuration
         container.Register<IGameSettings, GameSettings>(Scope.Singleton);
         container.Register<IBoardLayoutFactory, BoardLayoutFactory>(Scope.Singleton);
         container.Register<IGameModeFactory, GameModeFactory>(Scope.Singleton);
+        container.Register<IBotDifficultyFactory, BotDifficultyFactory>(Scope.Singleton);
 
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
@@ -103,6 +105,27 @@ public static class Configuration
         factory.RegisterMode(
             new GameModeOption(GameModeType.PvE, "Player vs Bot", "Play against AI opponent"),
             new PvEConfiguration(PlayerType.X, BotDifficulty.Easy)
+        );
+    }
+
+    public static void ConfigureBotDifficulties(DiContainer container)
+    {
+        var factory = container.Resolve<IBotDifficultyFactory>();
+
+        factory.RegisterDifficulty(
+            new BotDifficultyOption(
+                BotDifficulty.Easy,
+                "Easy Bot",
+                "Bot makes random moves"
+            )
+        );
+
+        factory.RegisterDifficulty(
+            new BotDifficultyOption(
+                BotDifficulty.Hard,
+                "Hard Bot",
+                "Bot uses greedy strategy to maximize pieces"
+            )
         );
     }
 
