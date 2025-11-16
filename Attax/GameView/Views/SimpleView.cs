@@ -1,3 +1,4 @@
+using GameMode.ModeConfigurations;
 using Model.Game.DTOs;
 using Model.PlayerType;
 using Stats;
@@ -137,5 +138,12 @@ public class SimpleView : IGameView
     
     public void DisplaySetModeResult(string modeName) =>
         DisplayMessage($"Game mode set to {modeName}.");
+
+    public void DisplayBotDifficultyOptions()
+    {
+        Console.WriteLine("Select bot difficulty:");
+        Console.WriteLine("1. Easy Bot");
+        Console.WriteLine("2. Hard Bot");
+    }
 }
 
