@@ -1,4 +1,5 @@
 using GameMode;
+using GameMode.ModeConfigurations;
 using GameMode.ModeType;
 using Layout.LayoutType;
 using Model.Board;
@@ -10,6 +11,7 @@ public class GameSettings : IGameSettings
     private int _boardSize = BoardConstants.DefaultSize;
     private LayoutType? _layoutType;
     private GameModeType? _gameModeType;
+    private BotDifficulty? _botDifficulty;
     private bool _isGameStarted;
     
     public int BoardSize
@@ -53,6 +55,18 @@ public class GameSettings : IGameSettings
         }
     }
 
+    public BotDifficulty? BotDifficulty
+    {
+        get => _botDifficulty;
+        set
+        {
+            if (_isGameStarted)
+                throw new InvalidOperationException("You can't change the bot difficulty after game has started!!!");
+            
+            _botDifficulty = value;
+        }
+    }
+
     public void MarkGameAsStarted() => _isGameStarted = true;
 
     public void Reset()
@@ -60,6 +74,8 @@ public class GameSettings : IGameSettings
         _isGameStarted = false;
         _boardSize = BoardConstants.DefaultSize;
         _layoutType = null;
+        _gameModeType = null;
+        _botDifficulty = null;
     }
 }
 
