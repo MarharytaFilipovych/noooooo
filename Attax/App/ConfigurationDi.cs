@@ -1,5 +1,6 @@
 using Bot;
-using Bot.Orchestrator;
+using Bot.BotFactory;
+using Bot.Evaluation;
 using Bot.Strategy;
 using Commands.CommandDefinition;
 using Commands.CommandExecutor;
@@ -7,7 +8,6 @@ using Commands.CommandProcessor;
 using Configurator;
 using ConsoleOutput;
 using Core;
-using GameMode;
 using GameMode.Factory;
 using GameMode.ModeConfigurations;
 using GameMode.ModeType;
@@ -43,17 +43,16 @@ public static class Configuration
         container.Register<StatisticsOptions, StatisticsOptions>(Scope.Singleton);
         container.Register<BotOptions, BotOptions>(Scope.Singleton);
         container.Register<TurnTimerOptions, TurnTimerOptions>(Scope.Singleton);
-        
+
         container.Register<IGameSettings, GameSettings>(Scope.Singleton);
         container.Register<IBoardLayoutFactory, BoardLayoutFactory>(Scope.Singleton);
         container.Register<IGameModeFactory, GameModeFactory>(Scope.Singleton);
-        
+
         container.Register<IViewFactory, ViewFactory>(Scope.Singleton);
         container.Register<IViewSwitcher, ViewSwitcher.ViewSwitcher>(Scope.Singleton);
         container.Register<IConsoleOutput, ConsoleOutput.ConsoleOutput>(Scope.Singleton);
-        
-        container.Register<IBotStrategy, RandomBotStrategy>(Scope.Singleton);
-        container.Register<IBotOrchestrator, BotOrchestrator>(Scope.Singleton);
+
+        container.Register<IBotStrategyFactory, BotStrategyFactory>(Scope.Singleton);
 
         container.Register<IMoveExecutor, MoveExecutor>(Scope.Singleton);
         container.Register<IMoveValidator, MoveValidator>(Scope.Singleton);
@@ -61,14 +60,14 @@ public static class Configuration
         container.Register<IGameEndDetector, GameEndDetector>(Scope.Singleton);
         container.Register<ITurnTimer, Model.Game.TurnTimer.TurnTimer>(Scope.Singleton);
         container.Register<ICareTakerFactory, CareTakerFactory>(Scope.Singleton);
-        
+
         container.Register<IStatisticsRepository, JsonStatisticsRepository>(Scope.Singleton);
         container.Register<IStatsTracker, StatsTracker>(Scope.Singleton);
-        
+
         container.Register<AtaxxGameWithEvents, AtaxxGameWithEvents>(Scope.Singleton);
 
         container.Register<ICommandProcessor, CommandProcessor>(Scope.Singleton);
-        
+
         container.Register<IGameConfigurator, GameConfigurator>(Scope.Singleton);
         container.Register<IGamePresenter, GamePresenter>(Scope.Singleton);
 
@@ -93,7 +92,7 @@ public static class Configuration
     public static void ConfigureGameModes(DiContainer container)
     {
         var factory = container.Resolve<IGameModeFactory>();
-        
+
         factory.RegisterMode(
             new GameModeOption(GameModeType.PvP, "Player vs Player", "Two human players compete"),
             new PvPConfiguration()
@@ -101,8 +100,23 @@ public static class Configuration
 
         factory.RegisterMode(
             new GameModeOption(GameModeType.PvE, "Player vs Bot", "Play against AI opponent"),
-            new PvEConfiguration(PlayerType.X) 
+            new PvEConfiguration(PlayerType.X, BotDifficulty.Easy)
         );
+    }
+
+    public static void ConfigureBotStrategies(DiContainer container)
+    {
+        var factory = container.Resolve<IBotStrategyFactory>();
+        var moveExecutor = container.Resolve<IMoveExecutor>();
+        var moveValidator = container.Resolve<IMoveValidator>();
+
+        factory.RegisterStrategy(
+            BotDifficulty.Easy,
+            new RandomBotStrategy());
+
+        factory.RegisterStrategy(
+            BotDifficulty.Hard,
+            new GreedyBotStrategy(new GreedyMoveEvaluator(moveExecutor, moveValidator)));
     }
 
     public static void ConfigureCommands(DiContainer container)
@@ -111,33 +125,33 @@ public static class Configuration
         var game = container.Resolve<AtaxxGameWithEvents>();
         var viewSwitcher = container.Resolve<IViewSwitcher>();
         var settings = container.Resolve<IGameSettings>();
-        
+
         commandProcessor.Register(
-            new MoveCommandDefinition(), 
+            new MoveCommandDefinition(),
             new MoveCommandExecutor(game));
-        
+
         commandProcessor.Register(
-            new SwitchViewCommandDefinition(), 
+            new SwitchViewCommandDefinition(),
             new SwitchViewCommandExecutor(viewSwitcher));
-        
+
         commandProcessor.Register(
-            new QuitCommandDefinition(), 
+            new QuitCommandDefinition(),
             new QuitCommandExecutor());
-        
+
         commandProcessor.Register(
-            new HintCommandDefinition(), 
+            new HintCommandDefinition(),
             new HintCommandExecutor(game));
-        
+
         commandProcessor.Register(
-            new HelpCommandDefinition(), 
-            new HelpCommandExecutor(game,commandProcessor.Commands().ToList()));
-        
+            new HelpCommandDefinition(),
+            new HelpCommandExecutor(game, commandProcessor.Commands().ToList()));
+
         commandProcessor.Register(
-            new StatsCommandDefinition(), 
+            new StatsCommandDefinition(),
             new StatsCommandExecutor(game));
-        
+
         commandProcessor.Register(
-            new UndoCommandDefinition(), 
+            new UndoCommandDefinition(),
             new UndoCommandExecutor(game));
     }
 }
