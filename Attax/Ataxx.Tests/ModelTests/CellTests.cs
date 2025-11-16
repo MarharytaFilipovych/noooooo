@@ -1,8 +1,7 @@
-using NUnit.Framework;
 using Model;
 using Model.PlayerType;
 
-namespace Ataxx.Tests.Model
+namespace Ataxx.Tests.ModelTests
 {
     [TestFixture]
     public class CellTests

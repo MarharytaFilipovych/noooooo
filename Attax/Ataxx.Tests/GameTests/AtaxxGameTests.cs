@@ -1,24 +1,23 @@
-using NUnit.Framework;
-using Moq;
+using GameMode;
+using GameMode.Factory;
+using GameMode.ModeConfigurations;
+using Layout.Factory;
+using Model.Game.CareTaker;
+using Model.Game.EndDetector;
 using Model.Game.Game;
 using Model.Game.Settings;
 using Model.Game.TurnTimer;
-using Model.Game.CareTaker;
-using Model.Game.EndDetector;
 using Model.PlayerType;
+using Moq;
 using Move.Executor;
 using Move.Generator;
 using Move.Validator;
 using Stats.Tracker;
-using Layout.Factory;
-using GameMode.Factory;
-using GameMode;
-using GameMode.ModeConfigurations;
 using MoveClass = Move.Move;
 using BoardClass = Model.Board.Board;
 using Position = Model.Position.Position;
 
-namespace Ataxx.Tests.Game
+namespace Ataxx.Tests.GameTests
 {
     [TestFixture]
     public class AtaxxGameTests
@@ -170,7 +169,7 @@ namespace Ataxx.Tests.Game
 
             _mockExecutor.Setup(e => e.ExecuteMove(It.IsAny<BoardClass>(), 
                 It.IsAny<MoveClass>(), It.IsAny<PlayerType>()))
-                .Returns(new List<Position>());
+                .Returns([]);
 
             _mockEndDetector.Setup(d => d.CheckGameEnd(It.IsAny<BoardClass>(), 
                 It.IsAny<IMoveValidator>(), It.IsAny<PlayerType>()))
@@ -178,7 +177,7 @@ namespace Ataxx.Tests.Game
 
             _mockValidator.Setup(v => v.GetValidMoves(It.IsAny<BoardClass>(), 
                 It.IsAny<PlayerType>()))
-                .Returns(new List<MoveClass> { new MoveClass(new Position(0, 0), new Position(0, 1)) });
+                .Returns([new MoveClass(new Position(0, 0), new Position(0, 1))]);
 
             var initialPlayer = _game.CurrentPlayer;
             var result = _game.MakeMove(new Position(0, 0), new Position(0, 1));
@@ -198,17 +197,17 @@ namespace Ataxx.Tests.Game
 
             _mockExecutor.Setup(e => e.ExecuteMove(It.IsAny<BoardClass>(), 
                 It.IsAny<MoveClass>(), It.IsAny<PlayerType>()))
-                .Returns(new List<Position>());
+                .Returns([]);
 
             _mockEndDetector.Setup(d => d.CheckGameEnd(It.IsAny<BoardClass>(), 
                 It.IsAny<IMoveValidator>(), It.IsAny<PlayerType>()))
                 .Returns(new GameEndResult(false, PlayerType.None));
 
             _mockValidator.Setup(v => v.GetValidMoves(It.IsAny<BoardClass>(), PlayerType.O))
-                .Returns(new List<MoveClass>());
+                .Returns([]);
 
             _mockValidator.Setup(v => v.GetValidMoves(It.IsAny<BoardClass>(), PlayerType.X))
-                .Returns(new List<MoveClass> { new MoveClass(new Position(0, 0), new Position(0, 1)) });
+                .Returns([new MoveClass(new Position(0, 0), new Position(0, 1))]);
 
             _game.MakeMove(new Position(0, 0), new Position(0, 1));
 
@@ -265,7 +264,7 @@ namespace Ataxx.Tests.Game
         [Test]
         public void UndoLastMove_InPvPMode_ReturnsFalse()
         {
-            _mockSettings.Setup(s => s.GameModeType).Returns((ModeType?)ModeType.PvP);
+            _mockSettings.Setup(s => s.GameModeType).Returns(ModeType.PvP);
             _mockGameModeFactory.Setup(f => f.GetConfiguration(ModeType.PvP))
                 .Returns(new PvPConfiguration());
 
@@ -315,7 +314,7 @@ namespace Ataxx.Tests.Game
 
             _mockExecutor.Setup(e => e.ExecuteMove(It.IsAny<BoardClass>(), 
                 It.IsAny<MoveClass>(), It.IsAny<PlayerType>()))
-                .Returns(new List<Position>());
+                .Returns([]);
 
             _mockEndDetector.Setup(d => d.CheckGameEnd(It.IsAny<BoardClass>(), 
                 It.IsAny<IMoveValidator>(), It.IsAny<PlayerType>()))
@@ -323,7 +322,7 @@ namespace Ataxx.Tests.Game
 
             _mockValidator.Setup(v => v.GetValidMoves(It.IsAny<BoardClass>(), 
                 It.IsAny<PlayerType>()))
-                .Returns(new List<MoveClass> { new MoveClass(new Position(0, 0), new Position(0, 1)) });
+                .Returns([new MoveClass(new Position(0, 0), new Position(0, 1))]);
 
             _game.MakeMove(new Position(0, 0), new Position(0, 1));
             var playerAfterMove = _game.CurrentPlayer;

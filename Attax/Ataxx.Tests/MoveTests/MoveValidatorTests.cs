@@ -1,11 +1,10 @@
-using NUnit.Framework;
 using Model.Board;
 using Model.PlayerType;
 using Move.Validator;
 using MoveClass = Move.Move;
 using Position = Model.Position.Position;
 
-namespace Ataxx.Tests.Move.Validator
+namespace Ataxx.Tests.MoveTests
 {
     [TestFixture]
     public class MoveValidatorTests

@@ -1,12 +1,11 @@
-using NUnit.Framework;
-using Model.PlayerType;
-using Model.Board;
-using Moq;
 using Layout.Layout;
+using Model.Board;
+using Model.PlayerType;
+using Moq;
 using Position = Model.Position.Position;
 using BoardClass = Model.Board.Board;
 
-namespace Ataxx.Tests.Model.Board
+namespace Ataxx.Tests.ModelTests
 {
     [TestFixture]
     public class BoardTests

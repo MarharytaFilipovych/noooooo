@@ -1,14 +1,13 @@
-using NUnit.Framework;
-using Moq;
-using Model.Board;
-using Model.PlayerType;
-using Model.Game.EndDetector;
-using Move.Validator;
 using Layout.Layout;
+using Model.Board;
+using Model.Game.EndDetector;
+using Model.PlayerType;
+using Moq;
+using Move.Validator;
 using MoveClass = Move.Move;
 using Position = Model.Position.Position;
 
-namespace Ataxx.Tests.Game.EndDetector
+namespace Ataxx.Tests.GameTests
 {
     [TestFixture]
     public class GameEndDetectorTests
@@ -129,7 +128,7 @@ namespace Ataxx.Tests.Game.EndDetector
             
             _board.GetCell(new Position(3, 3)).MarkAsBlocked();
     
-            int xCount = 0, oCount = 0;
+            var xCount = 0;
             for (var row = 0; row < 7; row++)
             {
                 for (var col = 0; col < 7; col++)
@@ -144,7 +143,6 @@ namespace Ataxx.Tests.Game.EndDetector
                     else
                     {
                         _board.GetCell(new Position(row, col)).OccupyBy(PlayerType.O);
-                        oCount++;
                     }
                 }
             }
@@ -202,9 +200,9 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(6, 6)).OccupyBy(PlayerType.O);
 
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.X))
-                .Returns(new List<MoveClass>());
+                .Returns([]);
             _mockValidator.Setup(v => v.GetValidMoves(_board, PlayerType.O))
-                .Returns(new List<MoveClass>());
+                .Returns([]);
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
 
@@ -281,7 +279,7 @@ namespace Ataxx.Tests.Game.EndDetector
             _board.GetCell(new Position(6, 5)).OccupyBy(PlayerType.O);
 
             _mockValidator.Setup(v => v.GetValidMoves(_board, It.IsAny<PlayerType>()))
-                .Returns(new List<MoveClass>());
+                .Returns([]);
 
             var result = _detector.CheckGameEnd(_board, _mockValidator.Object, PlayerType.X);
 
