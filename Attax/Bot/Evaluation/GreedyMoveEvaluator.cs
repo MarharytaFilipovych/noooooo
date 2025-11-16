@@ -35,8 +35,6 @@ public class GreedyMoveEvaluator(
         return pieceDifference * _weights.PieceDifferenceWeight + movesDifference * _weights.MovesWeight;
     }
 
-    private int CountValidMoves(Board board, PlayerType playerType)
-    {
-        return moveValidator.GetValidMoves(board, playerType).Count;
-    }
+    private int CountValidMoves(Board board, PlayerType playerType) =>
+        moveValidator.GetValidMoves(board, playerType).Count;
 }

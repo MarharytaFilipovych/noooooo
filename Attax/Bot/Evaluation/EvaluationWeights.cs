@@ -8,6 +8,6 @@ public record EvaluationWeights
         MovesWeight = 1
     };
 
-    public int PieceDifferenceWeight { get; init; } = 100;
-    public int MovesWeight { get; init; } = 1;
+    public int PieceDifferenceWeight { get; init; } = Default.PieceDifferenceWeight;
+    public int MovesWeight { get; init; } = Default.MovesWeight;
 }

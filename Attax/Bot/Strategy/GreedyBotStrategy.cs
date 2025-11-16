@@ -11,9 +11,7 @@ public class GreedyBotStrategy(IMoveEvaluator moveEvaluator) : IBotStrategy
     public Move.Move SelectMove(List<Move.Move> validMoves, Board board, PlayerType botPlayer)
     {
         if (validMoves.Count == 0)
-        {
             throw new InvalidOperationException("No valid moves available");
-        }
 
         var bestMoves = new List<Move.Move>();
         var maxScore = int.MinValue;
@@ -28,10 +26,7 @@ public class GreedyBotStrategy(IMoveEvaluator moveEvaluator) : IBotStrategy
                 bestMoves.Clear();
                 bestMoves.Add(move);
             }
-            else if (score == maxScore)
-            {
-                bestMoves.Add(move);
-            }
+            else if (score == maxScore) bestMoves.Add(move);
         }
 
         return bestMoves[_random.Next(bestMoves.Count)];

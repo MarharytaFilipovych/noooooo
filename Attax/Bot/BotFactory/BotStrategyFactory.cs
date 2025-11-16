@@ -9,18 +9,12 @@ public class BotStrategyFactory : IBotStrategyFactory
 
     public void RegisterStrategy(BotDifficulty botDifficulty, IBotStrategy botStrategy)
     {
-        if (_strategies.ContainsKey(botDifficulty))
-        {
+        if (!_strategies.TryAdd(botDifficulty, botStrategy)) 
             throw new ArgumentException($"Duplicate strategy: {botDifficulty}");
-        }
-
-        _strategies[botDifficulty] = botStrategy;
     }
 
-    public IBotStrategy GetStrategy(BotDifficulty difficulty)
-    {
-        return _strategies.TryGetValue(difficulty, out var strategy)
+    public IBotStrategy GetStrategy(BotDifficulty difficulty) =>
+        _strategies.TryGetValue(difficulty, out var strategy)
             ? strategy
             : throw new ArgumentException($"Unknown difficulty: {difficulty}");
-    }
 }

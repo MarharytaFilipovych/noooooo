@@ -1,6 +1,5 @@
 using GameMode.BotDifficultyFactory;
 using GameMode.Factory;
-using GameMode.ModeConfigurations;
 using GameMode.ModeType;
 using Layout.Factory;
 using Layout.LayoutType;
@@ -43,10 +42,7 @@ public class GameConfigurator(
         var selectedMode = GetModeSelection(modes);
         gameSettings.GameModeType = selectedMode.ModeType;
 
-        if (selectedMode.ModeType == GameModeType.PvE)
-        {
-            ConfigureBotDifficulty();
-        }
+        if (selectedMode.ModeType == GameModeType.PvE) ConfigureBotDifficulty();
     }
 
     private void ConfigureBotDifficulty()
