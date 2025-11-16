@@ -1,4 +1,3 @@
-using GameMode.ModeType;
 using Model.PlayerType;
 
 namespace GameMode.ModeConfigurations;
@@ -15,7 +14,7 @@ public class PvEConfiguration : IGameModeConfiguration
         BotDifficulty = botDifficulty;
     }
 
-    public GameModeType ModeType => GameModeType.PvE;
+    public ModeType ModeType => ModeType.PvE;
     public bool IsBot(PlayerType player) => player == BotPlayer;
     
     public PlayerType HumanPlayer { get; }

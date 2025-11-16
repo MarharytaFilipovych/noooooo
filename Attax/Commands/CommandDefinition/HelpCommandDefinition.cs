@@ -1,6 +1,5 @@
 using Command;
 using GameMode;
-using GameMode.ModeType;
 
 namespace Commands.CommandDefinition;
 
@@ -18,6 +17,6 @@ public class HelpCommandDefinition : ICommandDefinition
         return true;
     }
     
-    public bool IsAvailableInMode(GameModeType modeType) => 
-        modeType is GameModeType.PvE or GameModeType.PvP;
+    public bool IsAvailableInMode(ModeType modeType) => 
+        modeType is ModeType.PvE or ModeType.PvP;
 }

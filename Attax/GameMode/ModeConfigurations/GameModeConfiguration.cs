@@ -4,6 +4,6 @@ namespace GameMode.ModeConfigurations;
 
 public interface IGameModeConfiguration
 {
-    public ModeType.GameModeType ModeType { get; }
+    public ModeType ModeType { get; }
     public bool IsBot(PlayerType player);
 }

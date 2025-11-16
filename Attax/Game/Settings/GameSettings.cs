@@ -1,7 +1,6 @@
 using GameMode;
 using GameMode.ModeConfigurations;
-using GameMode.ModeType;
-using Layout.LayoutType;
+using Layout;
 using Model.Board;
 
 namespace Model.Game.Settings;
@@ -10,7 +9,7 @@ public class GameSettings : IGameSettings
 {
     private int _boardSize = BoardConstants.DefaultSize;
     private LayoutType? _layoutType;
-    private GameModeType? _gameModeType;
+    private ModeType? _gameModeType;
     private BotDifficulty? _botDifficulty;
     private bool _isGameStarted;
     
@@ -43,7 +42,7 @@ public class GameSettings : IGameSettings
         }
     }
     
-    public GameModeType? GameModeType
+    public ModeType? GameModeType
     {
         get => _gameModeType;
         set

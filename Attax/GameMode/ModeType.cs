@@ -1,8 +1,8 @@
 using System.ComponentModel;
 
-namespace GameMode.ModeType;
+namespace GameMode;
 
-public enum GameModeType
+public enum ModeType
 {
     [Description("Player vs Player")] 
     PvP, 

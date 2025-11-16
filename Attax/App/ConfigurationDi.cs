@@ -9,10 +9,10 @@ using Commands.CommandProcessor;
 using Configurator;
 using ConsoleOutput;
 using Core;
+using GameMode;
 using GameMode.BotDifficultyFactory;
 using GameMode.Factory;
 using GameMode.ModeConfigurations;
-using GameMode.ModeType;
 using Layout.Factory;
 using Layout.Layout;
 using Model;
@@ -98,12 +98,12 @@ public static class Configuration
         var factory = container.Resolve<IGameModeFactory>();
 
         factory.RegisterMode(
-            new GameModeOption(GameModeType.PvP, "Player vs Player", "Two human players compete"),
+            new GameModeOption(ModeType.PvP, "Player vs Player", "Two human players compete"),
             new PvPConfiguration()
         );
 
         factory.RegisterMode(
-            new GameModeOption(GameModeType.PvE, "Player vs Bot", "Play against AI opponent"),
+            new GameModeOption(ModeType.PvE, "Player vs Bot", "Play against AI opponent"),
             new PvEConfiguration(PlayerType.X, BotDifficulty.Easy)
         );
     }

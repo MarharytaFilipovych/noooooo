@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Layout.LayoutType;
+namespace Layout;
 
 public enum LayoutType
 {

@@ -6,7 +6,7 @@ public interface IBoardLayoutFactory
 {
     void RegisterLayout(IBoardLayout layout);
     IBoardLayout GetRandomLayout(Random? random = null);
-    IBoardLayout GetLayout(LayoutType.LayoutType type);
+    IBoardLayout GetLayout(LayoutType type);
     int GetLayoutCount();
-    IReadOnlyList<LayoutType.LayoutType> GetAvailableLayouts();
+    IReadOnlyList<LayoutType> GetAvailableLayouts();
 }

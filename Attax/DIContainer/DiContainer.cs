@@ -16,29 +16,41 @@ public class DiContainer : IDiContainer
         };
     }
 
-    private object Resolve(Type type)
+    private object Resolve(Type type, HashSet<Type>? resolving = null)
     {
+        resolving ??= [];
+
+        if (!resolving.Add(type))
+            throw new InvalidOperationException($"Circular dependency detected for type {type}");
+
         if (_typesToObjects.TryGetValue(type, out var existing))
+        {
+            resolving.Remove(type);
             return existing;
-        
+        }
+
         if (type.IsPrimitive || type.IsEnum)
             throw new InvalidOperationException($"Cannot resolve primitive or enum type: {type}");
-        
+
         if (!_typesToImplementation.TryGetValue(type, out var binding))
             throw new InvalidOperationException($"Type {type} is not registered in the container.");
-        
-        if (binding.Scope == Scope.Singleton && _typesToObjects.TryGetValue(type, out var result))
-            return result;
-        
+
         var implementationType = binding.ImplementationType;
         var constructor = implementationType.GetConstructors().First();
 
-        var instance = constructor.Invoke(constructor.GetParameters()
-            .Select(parameter => Resolve(parameter.ParameterType)).ToArray());
+        var parameters = constructor.GetParameters()
+            .Select(p => Resolve(p.ParameterType, resolving))
+            .ToArray();
 
-        _typesToObjects[type] = instance;
+        var instance = constructor.Invoke(parameters);
+
+        if (binding.Scope == Scope.Singleton)
+            _typesToObjects[type] = instance;
+
+        resolving.Remove(type);
         return instance;
     }
+
 
     public T Resolve<T>()
     {

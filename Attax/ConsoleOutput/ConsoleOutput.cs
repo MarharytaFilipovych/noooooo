@@ -1,7 +1,7 @@
-﻿using GameMode.ModeType;
-using Model;
+﻿using Model;
 using Model.Game.Game;
 using Model.PlayerType;
+using Settings;
 using Stats;
 using View.Views;
 using ViewSwitcher;
@@ -17,7 +17,6 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         game.GameStarted += OnGameStarted;
         game.TurnChanged += OnTurnChanged;
         game.MoveMade += OnMoveMade;
-        game.MoveInvalid += OnMoveInvalid;
         game.PlayerWon += OnPlayerWon;
         game.GameDrawn += OnGameDrawn;
         game.BoardUpdated += OnBoardUpdated;
@@ -56,9 +55,7 @@ public class ConsoleOutput(AtaxxGameWithEvents game, IViewSwitcher viewSwitcher)
         var isBot = game.GameMode.IsBot(player);
         View.DisplayMove(move, player, isBot);
     }
-
-    private void OnMoveInvalid(Move.Move move, PlayerType player) => View.DisplayInvalidMove(move);
-
+    
     private void OnPlayerWon(PlayerType winner) => View.DisplayGameEnd(game.GetGameState(), winner);
 
     private void OnGameDrawn() => View.DisplayGameEnd( game.GetGameState(), PlayerType.None);
