@@ -1,6 +1,5 @@
 using Command;
 using GameMode;
-using GameMode.ModeType;
 
 namespace Commands.CommandDefinition;
 
@@ -20,6 +19,6 @@ public class UndoCommandDefinition : ICommandDefinition
         return true;
     }
     
-    public bool IsAvailableInMode(GameModeType modeType) => 
-        modeType is GameModeType.PvE;
+    public bool IsAvailableInMode(ModeType modeType) => 
+        modeType is ModeType.PvE;
 }

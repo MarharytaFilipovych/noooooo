@@ -5,5 +5,5 @@ namespace Bot.Orchestrator;
 
 public interface IBotOrchestrator
 {
-    void MakeBotMove(AtaxxGameWithEvents game, PlayerType botPlayer);
+    Move.Move? SuggestMove(AtaxxGame game, PlayerType botPlayer);
 }

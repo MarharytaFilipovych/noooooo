@@ -1,12 +1,11 @@
 using GameMode.ModeConfigurations;
-using GameMode.ModeType;
 
 namespace GameMode.Factory;
 
 public class GameModeFactory : IGameModeFactory
 {
-    private readonly Dictionary<GameModeType, IGameModeConfiguration> _configurations = new();
-    private readonly Dictionary<GameModeType, GameModeOption> _modeOptions = new();
+    private readonly Dictionary<ModeType, IGameModeConfiguration> _configurations = new();
+    private readonly Dictionary<ModeType, GameModeOption> _modeOptions = new();
     private IGameModeConfiguration? _defaultConfiguration;
 
     public void RegisterMode(GameModeOption option, IGameModeConfiguration configuration)
@@ -27,7 +26,7 @@ public class GameModeFactory : IGameModeFactory
     public IGameModeConfiguration GetDefaultConfiguration() => 
         _defaultConfiguration ?? throw new InvalidOperationException("No game modes have been registered.");
 
-    public IGameModeConfiguration GetConfiguration(GameModeType modeType) => 
+    public IGameModeConfiguration GetConfiguration(ModeType modeType) => 
         !_configurations.TryGetValue(modeType, out var config) 
             ? throw new InvalidOperationException($"No configuration registered for modeType: {modeType}")
             : config;

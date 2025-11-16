@@ -17,7 +17,7 @@ public class EnhancedView : IGameView
 
 
     public void UpdateBoard(GameState state)
-    { 
+    {
         Console.WriteLine("\nAtaxx - Enhanced GameView❤️❤️❤️❤️");
         Console.WriteLine("────────────────────────────────");
 
@@ -44,6 +44,7 @@ public class EnhancedView : IGameView
             Console.Write($" {(char)('A' + col)} ");
             if (col < boardSize - 1) Console.Write(" ");
         }
+
         Console.WriteLine();
     }
 
@@ -55,6 +56,7 @@ public class EnhancedView : IGameView
             Console.Write("───");
             if (col < boardSize - 1) Console.Write("┬");
         }
+
         Console.WriteLine("┐");
     }
 
@@ -66,6 +68,7 @@ public class EnhancedView : IGameView
             Console.Write("───");
             if (col < boardSize - 1) Console.Write("┼");
         }
+
         Console.WriteLine("┤");
     }
 
@@ -77,6 +80,7 @@ public class EnhancedView : IGameView
             Console.Write("───");
             if (col < boardSize - 1) Console.Write("┴");
         }
+
         Console.WriteLine("┘");
     }
 
@@ -90,6 +94,7 @@ public class EnhancedView : IGameView
             Console.Write($" {symbol} ");
             if (col < boardSize - 1) Console.Write("│");
         }
+
         Console.WriteLine("│");
     }
 
@@ -123,14 +128,14 @@ public class EnhancedView : IGameView
         UpdateBoard(state);
 
         Console.WriteLine("\n════════════════════════════════");
-        Console.WriteLine(winner == PlayerType.None 
+        Console.WriteLine(winner == PlayerType.None
             ? "    Game ended in a draw!"
             : $"    Player {winner} wins!");
 
 
         Console.WriteLine("════════════════════════════════");
     }
-    
+
     public void DisplayHint(List<Move.Move> validMoves)
     {
         Console.WriteLine("╔══════════════════════════════╗");
@@ -139,22 +144,22 @@ public class EnhancedView : IGameView
         validMoves.ForEach(move => Console.WriteLine($"  → {move}"));
     }
 
-    public void DisplayMessage(string message) => 
+    public void DisplayMessage(string message) =>
         Console.WriteLine($"❤️❤️❤️❤️❤️❤️ {message}");
-    
+
     public string DisplayGetInput()
     {
         Console.Write("❤️ ");
         return Console.ReadLine() ?? string.Empty;
     }
-    
+
     public void DisplayError(string error)
     {
         Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine($"OHHHHH NOOOOOOOOOOO🥺🥺🥺🥺🥺: {error}");
         Console.ResetColor();
     }
-    
+
     public void DisplayStatistics(GameStatistics stats)
     {
         const int valueWidth = 8;
@@ -172,7 +177,7 @@ public class EnhancedView : IGameView
 
         Console.WriteLine("╚════════════════════════════════════════╝\n");
     }
-    
+
     public void DisplayElapsedTimeOutMessage(PlayerType playerType)
     {
         Console.WriteLine("\n╔════════════════════════════════════════════╗");
@@ -181,7 +186,7 @@ public class EnhancedView : IGameView
         Console.WriteLine("║  A random move has been applied automatically. ║");
         Console.WriteLine("╚════════════════════════════════════════════╝");
     }
-    
+
     public void DisplayUndo(bool success, PlayerType player)
     {
         Console.WriteLine("\n╔════════════════════════════════════════╗");
@@ -254,7 +259,7 @@ public class EnhancedView : IGameView
         Console.WriteLine("\n========================\n");
         Console.ResetColor();
     }
-    
+
     public void DisplaySetModeResult(string modeName)
     {
         Console.ForegroundColor = ConsoleColor.Green;
@@ -262,5 +267,31 @@ public class EnhancedView : IGameView
         Console.ResetColor();
     }
 
-}
+    public void DisplayBotDifficultyOptions(List<(string DisplayName, string Description)> options)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("╔════════════════════════════════════╗");
+        Console.WriteLine("║     SELECT BOT DIFFICULTY          ║");
+        Console.WriteLine("╠════════════════════════════════════╣");
+        Console.ResetColor();
+        var maxNameLength = options.Count != 0 ? options.Max(o => o.DisplayName.Length) : 0;
 
+        for (var i = 0; i < options.Count; i++)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write($"║  {i + 1}. ");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            var namePadded = options[i].DisplayName.PadRight(maxNameLength);
+            Console.Write(namePadded);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($" - {options[i].Description}");
+            Console.ResetColor();
+        }
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("╚════════════════════════════════════╝");
+        Console.ResetColor();
+    }
+}

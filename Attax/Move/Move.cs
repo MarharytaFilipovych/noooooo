@@ -23,10 +23,7 @@ public class Move
 
     public bool IsValid => Type != MoveType.Invalid;
 
-    public override string ToString()
-    {
-        return $"{From} -> {To} ({Type})";
-    }
+    public override string ToString() => $"{From} -> {To} ({Type})";
 }
 
 public enum MoveType

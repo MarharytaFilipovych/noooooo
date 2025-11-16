@@ -1,9 +1,6 @@
 using GameMode;
 using GameMode.Factory;
-using GameMode.ModeConfigurations;
-using GameMode.ModeType;
 using Layout.Factory;
-using Layout.LayoutType;
 using Model.Game.CareTaker;
 using Model.Game.EndDetector;
 using Model.Game.Settings;
@@ -14,6 +11,7 @@ using Stats.Tracker;
 using Move.Executor;
 using Move.Generator;
 using Move.Validator;
+using Settings;
 
 namespace Model.Game.Game;
 
@@ -36,7 +34,6 @@ public class AtaxxGameWithEvents(
     public event Action? GameDrawn;
     public event Action<PlayerType.PlayerType>? TurnChanged;
     public event Action<Move.Move, PlayerType.PlayerType>? MoveMade;
-    public event Action<Move.Move, PlayerType.PlayerType>? MoveInvalid;
     public event Action<Cell[,]>? BoardUpdated;
     public event Action<List<Move.Move>>? HintRequested;
     public event Action<string>? ModeSet;
@@ -112,7 +109,7 @@ public class AtaxxGameWithEvents(
 
     public new void UndoLastMove()
     {
-        if (GameMode.ModeType != GameModeType.PvE)
+        if (GameMode.ModeType != ModeType.PvE)
         {
             RaiseError("Undo is only available in Player vs Bot modeType");
             return;

@@ -1,7 +1,6 @@
 using GameMode;
 using GameMode.Factory;
 using GameMode.ModeConfigurations;
-using GameMode.ModeType;
 using Layout.Factory;
 using Layout.Layout;
 using Model.Game.CareTaker;
@@ -47,7 +46,8 @@ public class AtaxxGame
     public PlayerType.PlayerType Winner => _progress.Winner;
     public bool IsEnded => _progress.IsEnded;
     protected int TurnNumber => _progress.TurnNumber;
-    protected string? LastValidationError; 
+    protected string? LastValidationError;
+    public Board.Board Board => _board;
 
     protected string LayoutName => _layout?.Name
         ?? throw new InvalidOperationException("Cannot get layout before the game has started.");
@@ -93,10 +93,18 @@ public class AtaxxGame
         _layout = _settings.LayoutType.HasValue
             ? _boardLayoutFactory.GetLayout(_settings.LayoutType.Value)
             : _boardLayoutFactory.GetRandomLayout();
-
-        _gameMode = _settings.GameModeType.HasValue
-            ? _gameModeFactory.GetConfiguration(_settings.GameModeType.Value)
-            : _gameModeFactory.GetDefaultConfiguration();
+        
+        if (_settings.GameModeType == ModeType.PvE)
+        {
+            var botDifficulty = _settings.BotDifficulty ?? BotDifficulty.Easy;
+            _gameMode = new PvEConfiguration(PlayerType.PlayerType.X, botDifficulty);
+        }
+        else
+        {
+            _gameMode = _settings.GameModeType.HasValue
+                ? _gameModeFactory.GetConfiguration(_settings.GameModeType.Value)
+                : _gameModeFactory.GetDefaultConfiguration();
+        }
 
         _board.Initialize(_layout);
         _progress.Initialize();
@@ -120,7 +128,10 @@ public class AtaxxGame
             return false;
         }
 
-        LastValidationError = null; 
+        LastValidationError = null;
+        
+        ExecuteMove(move);
+        
         return true;
     }
 
@@ -217,7 +228,7 @@ public class AtaxxGame
     public bool UndoLastMove()
     {
         EnsureGameStarted();
-        return _gameMode!.ModeType == GameModeType.PvE && _careTaker.Undo(UndoTimeWindowSeconds);
+        return _gameMode!.ModeType == ModeType.PvE && _careTaker.Undo(UndoTimeWindowSeconds);
     }
 
     public IMemento Save()

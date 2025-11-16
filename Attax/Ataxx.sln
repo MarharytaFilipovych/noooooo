@@ -42,6 +42,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameMode", "GameMode\GameMo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Configurator", "Configurator\Configurator.csproj", "{0D0953FE-BB2F-44B3-9F93-C1AF0928533E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Settings", "Settings\Settings.csproj", "{0B9FD44F-F30C-4A92-8DFD-1D70B036C65F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,10 @@ Global
 		{0D0953FE-BB2F-44B3-9F93-C1AF0928533E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D0953FE-BB2F-44B3-9F93-C1AF0928533E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D0953FE-BB2F-44B3-9F93-C1AF0928533E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B9FD44F-F30C-4A92-8DFD-1D70B036C65F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B9FD44F-F30C-4A92-8DFD-1D70B036C65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B9FD44F-F30C-4A92-8DFD-1D70B036C65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B9FD44F-F30C-4A92-8DFD-1D70B036C65F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F8C67DB4-E7DF-446D-8B57-FDE1084185AB} = {35F185AD-3095-4E90-912E-A82DFAA13DFD}

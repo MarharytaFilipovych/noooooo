@@ -11,7 +11,7 @@ public class HelpCommandExecutor(AtaxxGameWithEvents game, List<ICommandDefiniti
     {
         var availableCommands = commands
             .Where(c => c.IsAvailableInMode(game.GameMode.ModeType))
-            .Select(c => (c.Name, c.Usage, c.Description)) // value tuple
+            .Select(c => (c.Name, c.Usage, c.Description))
             .ToList();
         
         game.RequestHelp(availableCommands);

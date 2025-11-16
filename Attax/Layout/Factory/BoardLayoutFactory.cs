@@ -4,7 +4,7 @@ namespace Layout.Factory;
 
 public class BoardLayoutFactory : IBoardLayoutFactory
 {
-    private readonly Dictionary<LayoutType.LayoutType, IBoardLayout> _layouts = new();
+    private readonly Dictionary<LayoutType, IBoardLayout> _layouts = new();
 
     public void RegisterLayout(IBoardLayout layout)
     {
@@ -23,7 +23,7 @@ public class BoardLayoutFactory : IBoardLayoutFactory
         return _layouts[selectedLayout];
     }
 
-    public IBoardLayout GetLayout(LayoutType.LayoutType type)
+    public IBoardLayout GetLayout(LayoutType type)
     {
         if (!_layouts.TryGetValue(type, out var layout))
             throw new InvalidOperationException($"No layout registered for type {type}");
@@ -33,5 +33,5 @@ public class BoardLayoutFactory : IBoardLayoutFactory
 
     public int GetLayoutCount() => _layouts.Count;
 
-    public IReadOnlyList<LayoutType.LayoutType> GetAvailableLayouts() => _layouts.Keys.ToList();
+    public IReadOnlyList<LayoutType> GetAvailableLayouts() => _layouts.Keys.ToList();
 }

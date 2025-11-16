@@ -1,13 +1,13 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace Layout.LayoutType;
+namespace App;
 
-public static class LayoutTypeExtensions
+public static class EnumExtensions
 {
-    public static string GetDescription(this LayoutType value) 
+    public static string GetDescription<T>(this T value) where T : Enum
     {
-        var field = value.GetType().GetField(value.ToString());
+        var field = typeof(T).GetField(value.ToString());
         var attr = field?.GetCustomAttribute<DescriptionAttribute>();
         return attr?.Description ?? value.ToString();
     }
