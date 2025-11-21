@@ -9,5 +9,4 @@ public interface ICommandDefinition
     string Description { get; }
     string Usage { get; }
     bool TryParse(string[] args, out ICommand? command, out string? error);
-    bool IsAvailableInMode(ModeType modeType);
 }

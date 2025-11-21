@@ -47,7 +47,7 @@ public class AtaxxGame
     public bool IsEnded => _progress.IsEnded;
     protected int TurnNumber => _progress.TurnNumber;
     protected string? LastValidationError;
-    public Board.Board Board => _board;
+    public Board.Board? Board => _board;
 
     protected string LayoutName => _layout?.Name
         ?? throw new InvalidOperationException("Cannot get layout before the game has started.");
@@ -122,13 +122,17 @@ public class AtaxxGame
 
         var move = new Move.Move(from, to);
 
-        if (!_moveValidator.IsValidMove(_board, move, CurrentPlayer, out var validationError))
+        if (!_moveValidator.IsValidMove(_board!, move, CurrentPlayer, out var validationError))
         {
             LastValidationError = validationError; 
             return false;
         }
 
         LastValidationError = null;
+        
+        
+        if (_gameMode?.ModeType == ModeType.PvE && !_gameMode.IsBot(CurrentPlayer))
+            _careTaker.BackUp();
         
         ExecuteMove(move);
         
@@ -147,31 +151,31 @@ public class AtaxxGame
     public List<Move.Move> GetValidMoves()
     {
         EnsureGameStarted();
-        return _moveValidator.GetValidMoves(_board, CurrentPlayer);
+        return _moveValidator.GetValidMoves(_board!, CurrentPlayer);
     }
 
     public List<Move.Move> GetValidMoves(PlayerType.PlayerType player)
     {
         EnsureGameStarted();
-        return _moveValidator.GetValidMoves(_board, player);
+        return _moveValidator.GetValidMoves(_board!, player);
     }
 
-    public Cell GetCell(Position.Position pos)
+    private Cell GetCell(Position.Position pos)
     {
         EnsureGameStarted();
-        return _board.GetCell(pos);
+        return _board!.GetCell(pos);
     }
 
-    public Cell[,] GetBoard()
+    protected Cell[,] GetBoard()
     {
         EnsureGameStarted();
-        return _board.GetCells();
+        return _board!.GetCells();
     }
 
     public (int xCount, int oCount) GetPieceCounts()
     {
         EnsureGameStarted();
-        return _board.CountPieces();
+        return _board!.CountPieces();
     }
 
     public GameState GetGameState()
@@ -179,7 +183,7 @@ public class AtaxxGame
         EnsureGameStarted();
 
         var (xCount, oCount) = GetPieceCounts();
-        var cells = new CellState[_board.Size, _board.Size];
+        var cells = new CellState[_board!.Size, _board.Size];
 
         for (var row = 0; row < _board.Size; row++)
         {
@@ -234,7 +238,7 @@ public class AtaxxGame
     public IMemento Save()
     {
         EnsureGameStarted();
-        return new GameMemento(_board.Clone(), CurrentPlayer, TurnNumber);
+        return new GameMemento(_board!.Clone(), CurrentPlayer, TurnNumber);
     }
 
     public void Restore(IMemento memento)

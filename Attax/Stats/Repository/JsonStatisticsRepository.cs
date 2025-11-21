@@ -28,7 +28,7 @@ public class JsonStatisticsRepository(StatisticsOptions options) : IStatisticsRe
     public void SaveStatistics(GameStatistics statistics)
     {
         EnsureDirectoryExists(options.DirectoryName);
-        
+    
         try
         {
             var json = JsonSerializer.Serialize(statistics, JsonOptions);
@@ -47,8 +47,11 @@ public class JsonStatisticsRepository(StatisticsOptions options) : IStatisticsRe
     
     private static void EnsureDirectoryExists(string directoryName)
     {
-        if (!Directory.Exists(directoryName)) 
-            Directory.CreateDirectory(directoryName);
+        var projectRoot = GetProjectRoot();
+        var fullDirPath = Path.Combine(projectRoot, directoryName);
+    
+        if (!Directory.Exists(fullDirPath)) 
+            Directory.CreateDirectory(fullDirPath);
     }
     
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -64,16 +67,16 @@ public class JsonStatisticsRepository(StatisticsOptions options) : IStatisticsRe
     private static string GetProjectRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        var projectName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
-        var csprojFile = $"{projectName}.csproj";
 
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, csprojFile)))
+        while (directory != null)
         {
+            if (directory.GetFiles("*.sln").Length > 0)
+            {
+                return directory.FullName;
+            }
             directory = directory.Parent;
         }
 
-        return directory?.FullName ?? AppContext.BaseDirectory;
+        return AppContext.BaseDirectory;
     }
 }
-
-
