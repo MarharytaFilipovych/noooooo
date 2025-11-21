@@ -16,7 +16,4 @@ public class SwitchViewCommandDefinition : ICommandDefinition
         error = null;
         return true;
     }
-    
-    public bool IsAvailableInMode(ModeType modeType) =>
-        modeType is ModeType.PvE or ModeType.PvP;
 }

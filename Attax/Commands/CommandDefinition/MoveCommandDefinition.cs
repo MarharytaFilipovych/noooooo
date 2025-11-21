@@ -36,7 +36,4 @@ public class MoveCommandDefinition : ICommandDefinition
         command = new MoveCommand(from, to);
         return true;
     }
-    
-    public bool IsAvailableInMode(ModeType modeType) => 
-        modeType is ModeType.PvE or ModeType.PvP;
 }

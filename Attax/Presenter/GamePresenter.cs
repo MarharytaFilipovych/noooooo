@@ -77,7 +77,7 @@ public class GamePresenter(
                 Environment.Exit(0);
                 break;
             case ExecuteResult.Error:
-                viewSwitcher.CurrentView.DisplayError(error!);
+                if (!string.IsNullOrWhiteSpace(error)) viewSwitcher.CurrentView.DisplayError(error);
                 game.ResetTimer();
                 break;
         }
