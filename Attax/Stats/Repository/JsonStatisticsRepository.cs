@@ -67,13 +67,11 @@ public class JsonStatisticsRepository(StatisticsOptions options) : IStatisticsRe
     private static string GetProjectRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
-
+        const string slnFiles = "*.sln";
+        
         while (directory != null)
         {
-            if (directory.GetFiles("*.sln").Length > 0)
-            {
-                return directory.FullName;
-            }
+            if (directory.GetFiles(slnFiles).Length > 0) return directory.FullName;
             directory = directory.Parent;
         }
 
